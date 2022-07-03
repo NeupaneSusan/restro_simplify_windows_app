@@ -35,25 +35,40 @@ class _MySliderState extends State<MySlider> {
         return false;
       },
       child: Scaffold(
-        body: CarouselSlider(
-          options: CarouselOptions(
-              autoPlay: true,
-              autoPlayInterval: const Duration(seconds: 5),
-              height: height),
-          items: [1, 2, 3, 4, 5].map((i) {
-            return Builder(
-              builder: (BuildContext context) {
-                return Container(
-                    width: MediaQuery.of(context).size.width,
-                    margin: const EdgeInsets.symmetric(horizontal: 5.0),
-                    decoration: const BoxDecoration(color: Colors.amber),
-                    child: Text(
-                      'text $i',
-                      style: const TextStyle(fontSize: 16.0),
-                    ));
-              },
-            );
-          }).toList(),
+        body: Stack(
+          children: [
+           
+            CarouselSlider(
+              options: CarouselOptions(
+                  autoPlay: true,
+                  autoPlayInterval: const Duration(seconds: 5),
+                  height: height),
+              items: [1, 2, 3, 4, 5].map((i) {
+                return Builder(
+                  builder: (BuildContext context) {
+                    return Container(
+                        width: MediaQuery.of(context).size.width,
+                        margin: const EdgeInsets.symmetric(horizontal: 5.0),
+                        decoration: const BoxDecoration(color: Colors.amber),
+                        child: Text(
+                          'text $i',
+                          style: const TextStyle(fontSize: 16.0),
+                        ));
+                  },
+                );
+              }).toList(),
+            ),
+             Positioned(
+              top:0,
+              left:15.0,
+              child: GestureDetector(
+                onTap: () {
+                  Globals.timer!.cancel();
+        Globals.checkTime(context);
+        Navigator.pop(context);
+                },
+                child: const Icon( Icons.arrow_back,color: Colors.white,))),
+          ],
         ),
       ),
     );

@@ -121,65 +121,85 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        _alert(context);
-
-        return false;
-      },
-      child: Scaffold(
-          resizeToAvoidBottomInset: false,
-          body: SizedBox.expand(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
+    return  Listener(
+          behavior: HitTestBehavior.opaque,
+          
+          onPointerCancel: (event) {
+            Globals.timer?.cancel();
+            Globals.checkTime(context);
+          },
+          onPointerDown: (event) {
+            Globals.timer?.cancel();
+            Globals.checkTime(context);
+          },
+          onPointerHover: (event) {
+            Globals.timer?.cancel();
+            Globals.checkTime(context);
+          },
+          onPointerMove: (event) {
+            Globals.timer?.cancel();
+            Globals.checkTime(context);
+          },
+      child: WillPopScope(
+        onWillPop: () async {
+          _alert(context);
+    
+          return false;
+        },
+        child: Scaffold(
+            resizeToAvoidBottomInset: false,
+            body: SizedBox.expand(
+              child: PageView(
+                controller: _pageController,
+                onPageChanged: (index) {
+                  Globals.timer?.cancel();
+                  Globals.checkTime(context);
+                  setState(() => _selectedIndex = index);
+                },
+                children: <Widget>[
+                  PosPage(data: userData),
+                  OrderScreen(data: userData),
+                  ProfileScreen(
+                    data: userData,
+                    bytes: byte ?? bytess,
+                  ),
+                ],
+              ),
+            ),
+            bottomNavigationBar: BottomNavyBar(
+              selectedIndex: _selectedIndex,
+              showElevation: true,
+              onItemSelected: (index) {
                 Globals.timer?.cancel();
                 Globals.checkTime(context);
-                setState(() => _selectedIndex = index);
+                setState(() {
+                  _selectedIndex = index;
+                  _pageController!.animateToPage(index,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.ease);
+                });
               },
-              children: <Widget>[
-                PosPage(data: userData),
-                OrderScreen(data: userData),
-                ProfileScreen(
-                  data: userData,
-                  bytes: byte ?? bytess,
+              items: [
+                BottomNavyBarItem(
+                  icon: const Icon(Icons.apps),
+                  title: const Text('POS'),
+                  activeColor: Colors.blueGrey,
+                ),
+                BottomNavyBarItem(
+                    icon: const Icon(Icons.table_chart),
+                    title: const Text(
+                      'Running Tables',
+                      style: TextStyle(fontSize: 11),
+                    ),
+                    activeColor: Colors.blueGrey),
+                BottomNavyBarItem(
+                  icon: const Icon(Icons.person),
+                  title: const Text('User'),
+                  activeColor: Colors.blueGrey,
                 ),
               ],
-            ),
-          ),
-          bottomNavigationBar: BottomNavyBar(
-            selectedIndex: _selectedIndex,
-            showElevation: true,
-            onItemSelected: (index) {
-              Globals.timer?.cancel();
-              Globals.checkTime(context);
-              setState(() {
-                _selectedIndex = index;
-                _pageController!.animateToPage(index,
-                    duration: const Duration(milliseconds: 300),
-                    curve: Curves.ease);
-              });
-            },
-            items: [
-              BottomNavyBarItem(
-                icon: const Icon(Icons.apps),
-                title: const Text('POS'),
-                activeColor: Colors.blueGrey,
-              ),
-              BottomNavyBarItem(
-                  icon: const Icon(Icons.table_chart),
-                  title: const Text(
-                    'Running Tables',
-                    style: TextStyle(fontSize: 11),
-                  ),
-                  activeColor: Colors.blueGrey),
-              BottomNavyBarItem(
-                icon: const Icon(Icons.person),
-                title: const Text('User'),
-                activeColor: Colors.blueGrey,
-              ),
-            ],
-          )),
+            )),
+      ),
     );
   }
 }

@@ -43,8 +43,11 @@ class _ContainerPageState extends State<ContainerPage> {
     super.initState();
     Globals.timer?.cancel();
     Globals.checkTime(context);
+    getImageForSlider();
   }
-
+    getImageForSlider(){
+      
+    }
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/screens/homescreen.dart';
 import '../models/login.dart';
 import 'dart:async';
@@ -245,6 +246,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(
                               width: 400,
                               child: TextFormField(
+                                onChanged: ((value) {
+                                    Globals.timer!.cancel();
+        Globals.checkTime(context);
+                                }),
                                 controller: email,
                                 obscureText: false,
                                 style: style,
@@ -260,6 +265,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           SizedBox(
                             width: 400,
                             child: TextFormField(
+                              onChanged: (value) {
+                                  Globals.timer!.cancel();
+        Globals.checkTime(context);
+                              },
                               controller: password,
                               obscureText: true,
                               style: style,
@@ -286,6 +295,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                       padding: const EdgeInsets.fromLTRB(
                                           20.0, 15.0, 20.0, 15.0),
                                       onPressed: () async {
+                                          Globals.timer!.cancel();
+        Globals.checkTime(context);
                                         FocusScope.of(context)
                                             .requestFocus(FocusNode());
                                         if (email.text.isEmpty ||
