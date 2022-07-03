@@ -6,6 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
+import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vibration/vibration.dart';
 // import 'package:restro_ms/screens/loginscreen.dart';
@@ -67,7 +68,7 @@ class _OrderScreenState extends State<OrderScreen> {
           gravity: ToastGravity.CENTER,
           textColor: Colors.white,
           backgroundColor: Colors.green);
-       getOrderData();
+      getOrderData();
       return "success";
     } else {
       throw Exception('Failed to load data');
@@ -88,137 +89,146 @@ class _OrderScreenState extends State<OrderScreen> {
       DeviceOrientation.landscapeRight,
     ]);
     return Scaffold(
-      body: count == 0
-          ? const Center(
-              child: Center(
-                child: Text("No Orders Yet!"),
-              ),
-            )
-          : ListView(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Align(
-                    alignment: Alignment.center,
-                    child: Text(
-                      "Current Running Tables : " + count.toString(),
-                      style: const TextStyle(
-                          color: Colors.blueGrey,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18),
-                    ),
+        body: count == 0
+            ? GestureDetector(
+                onTap: () {
+                  Globals.timer?.cancel();
+                  Globals.checkTime(context);
+                },
+                child: const Center(
+                  child: Center(
+                    child: Text("No Orders Yet!"),
                   ),
                 ),
-                GridView.count(
-                  shrinkWrap: true,
-                  physics: const ScrollPhysics(),
-                  crossAxisCount: 7,
-                  children: orders!.map((data) {
-                    return InkWell(
-                      onLongPress: () {
-                        Vibration.vibrate(duration: 150, amplitude: 1);
-                        
-                        _neverSatisfied(data['id'], data['user_id']).then((value) {
-                          
-                        });
-                      },
-                      child: Card(
-                        color: data['is_printed'] == '0'
-                            ? Colors.blueGrey
-                            : Colors.blueGrey[300],
-                        child: InkWell(
-                          onTap: () async {
-                            // var res = await http.get
-                            // ('https://jsonplaceholder.typicode.com/photos');
-                            var res = await http.get(Uri.parse(url +
-                                '/tableOrders/' +
-                                widget.data['id'] +
-                                '/' +
-                                data['id']));
+              )
+            : ListView(
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Current Running Tables : " + count.toString(),
+                        style: const TextStyle(
+                            color: Colors.blueGrey,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18),
+                      ),
+                    ),
+                  ),
+                  GridView.count(
+                    shrinkWrap: true,
+                    physics: const ScrollPhysics(),
+                    crossAxisCount: 7,
+                    children: orders!.map((data) {
+                      return InkWell(
+                        onLongPress: () {
+                          Vibration.vibrate(duration: 150, amplitude: 1);
 
-                            if (res.statusCode == 200) {
-                             
-                              Navigator.of(context)
-                                  .push(MaterialPageRoute(builder: (context) {
-                                return EditPosScreen(
-                                    orderId: data['id'], data: widget.data);
-                              }));
-                            } else if (res.statusCode == 406) {
-                              var message = json.decode(res.body)['message'];
-                              Fluttertoast.showToast(
-                                  msg: message,
-                                  toastLength: Toast.LENGTH_LONG,
-                                  gravity: ToastGravity.CENTER,
-                                  textColor: Colors.white,
-                                  backgroundColor: Colors.green);
-                            } else if (res.statusCode == 401) {
-                              var message = json.decode(res.body)['message'];
-                              Fluttertoast.showToast(
-                                  msg: message,
-                                  toastLength: Toast.LENGTH_LONG,
-                                  gravity: ToastGravity.CENTER,
-                                  textColor: Colors.white,
-                                  backgroundColor: Colors.orange);
-                            }
-                          },
-                          child: Align(
-                            alignment: Alignment.center,
-                            child: Container(
-                              margin: const EdgeInsets.only(top: 5),
-                              child: Column(
-                                children: <Widget>[
-                                 const Padding(
-                                    padding:  EdgeInsets.symmetric(
-                                        horizontal: 35.0),
-                                    child: SizedBox(
-                                      width: 40.0,
-                                      child: Icon(Icons.table_bar, size: 35,color: Colors.white ,)),
-                                  ),
-                                  Text(
-                                    data['table_name'],
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 13),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 4.0),
-                                    child: Text(
-                                      data['order_created_time'],
+                          _neverSatisfied(data['id'], data['user_id'])
+                              .then((value) {});
+                        },
+                        child: Card(
+                          color: data['is_printed'] == '0'
+                              ? Colors.blueGrey
+                              : Colors.blueGrey[300],
+                          child: InkWell(
+                            onTap: () async {
+                              Globals.timer?.cancel();
+                              Globals.checkTime(context);
+                              // var res = await http.get
+                              // ('https://jsonplaceholder.typicode.com/photos');
+                              var res = await http.get(Uri.parse(url +
+                                  '/tableOrders/' +
+                                  widget.data['id'] +
+                                  '/' +
+                                  data['id']));
+
+                              if (res.statusCode == 200) {
+                                Navigator.of(context)
+                                    .push(MaterialPageRoute(builder: (context) {
+                                  return EditPosScreen(
+                                      orderId: data['id'], data: widget.data);
+                                }));
+                              } else if (res.statusCode == 406) {
+                                var message = json.decode(res.body)['message'];
+                                Fluttertoast.showToast(
+                                    msg: message,
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.CENTER,
+                                    textColor: Colors.white,
+                                    backgroundColor: Colors.green);
+                              } else if (res.statusCode == 401) {
+                                var message = json.decode(res.body)['message'];
+                                Fluttertoast.showToast(
+                                    msg: message,
+                                    toastLength: Toast.LENGTH_LONG,
+                                    gravity: ToastGravity.CENTER,
+                                    textColor: Colors.white,
+                                    backgroundColor: Colors.orange);
+                              }
+                            },
+                            child: Align(
+                              alignment: Alignment.center,
+                              child: Container(
+                                margin: const EdgeInsets.only(top: 5),
+                                child: Column(
+                                  children: <Widget>[
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 35.0),
+                                      child: SizedBox(
+                                          width: 40.0,
+                                          child: Icon(
+                                            Icons.table_bar,
+                                            size: 35,
+                                            color: Colors.white,
+                                          )),
+                                    ),
+                                    Text(
+                                      data['table_name'],
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 13),
                                     ),
-                                  ),
-                                  Container(
-                                    margin: const EdgeInsets.only(top: 5),
-                                    child: Align(
-                                      alignment: Alignment.bottomCenter,
-                                      child: Card(
-                                        color: Colors.blueGrey[200],
-                                        elevation: 0,
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(8.0),
-                                          child: Text(
-                                            "Rs.${data['net_amount']}",
-                                            style: const TextStyle(
-                                                color: Colors.white,
-                                                fontSize: 12),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4.0),
+                                      child: Text(
+                                        data['order_created_time'],
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 13),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 5),
+                                      child: Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Card(
+                                          color: Colors.blueGrey[200],
+                                          elevation: 0,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              "Rs.${data['net_amount']}",
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12),
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-    );
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ));
   }
 
   Future<void> _neverSatisfied(orderId, userId) async {
@@ -238,6 +248,8 @@ class _OrderScreenState extends State<OrderScreen> {
                 style: TextStyle(color: Colors.white),
               ),
               onPressed: () async {
+                Globals.timer?.cancel();
+                Globals.checkTime(context);
                 Navigator.of(context).pop();
               },
             ),
@@ -257,9 +269,11 @@ class _OrderScreenState extends State<OrderScreen> {
               ),
               child: const Text(
                 'Request Bill',
-                style:  TextStyle(color: Colors.white),
+                style: TextStyle(color: Colors.white),
               ),
               onPressed: () async {
+                Globals.timer?.cancel();
+                Globals.checkTime(context);
                 await _billRequest(orderId);
                 Navigator.of(context).pop(true);
               },

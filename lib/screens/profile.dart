@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 
 import 'package:provider/provider.dart';
 import 'package:restro_simplify/controller/CartController.dart';
+import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/models/floor.dart';
 import 'package:restro_simplify/screens/loginscreen.dart';
 import 'package:restro_simplify/screens/paidorders.dart';
@@ -48,9 +49,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
       for (var data in jsonData) {
         cats.add(Floor.fromJson(data));
       }
-      setState(() {
-        floor = cats;
-      });
+      if (mounted) {
+        setState(() {
+          floor = cats;
+        });
+      }
 
       return 'success';
     } else {
@@ -101,8 +104,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Align(
           alignment: Alignment.topRight,
           child: ElevatedButton.icon(
-           
-              onPressed: () => Navigator.pop(context),
+              onPressed: () {
+                Globals.timer?.cancel();
+                Globals.checkTime(context);
+                Navigator.pop(context);
+              },
               icon: const Icon(
                 Icons.close,
                 color: Colors.white,
@@ -128,13 +134,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
-
-                 ElevatedButton.icon(
+                  ElevatedButton.icon(
                       style: TextButton.styleFrom(
-                        backgroundColor: Colors.blueGrey,
-                        primary: Colors.white),
+                          backgroundColor: Colors.blueGrey,
+                          primary: Colors.white),
                       onPressed: () {
+                        Globals.timer?.cancel();
+                        Globals.checkTime(context);
                         showDialog(
                             context: context,
                             builder: (context) =>
@@ -151,9 +157,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(
                     height: 20,
                   ),
-                   ElevatedButton.icon(
-                      style: TextButton.styleFrom(backgroundColor: Colors.blueGrey),
+                  ElevatedButton.icon(
+                      style: TextButton.styleFrom(
+                          backgroundColor: Colors.blueGrey),
                       onPressed: () {
+                        Globals.timer?.cancel();
+                        Globals.checkTime(context);
                         showDialog(
                             context: context,
                             builder: (context) {
@@ -184,7 +193,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           const CircleAvatar(
                             radius: 30,
                             backgroundColor: Colors.blueGrey,
-                            child: Icon(Icons.person,color: Colors.white, size: 50,),
+                            child: Icon(
+                              Icons.person,
+                              color: Colors.white,
+                              size: 50,
+                            ),
                           ),
                           ListTile(
                               title: Center(
@@ -229,6 +242,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                             itemBuilder: (context, int i) {
                                               return InkWell(
                                                 onTap: () {
+                                                  Globals.timer?.cancel();
+                                                  Globals.checkTime(context);
                                                   if (floorId != floor[i].id) {
                                                     changeFloor(floor[i].id);
                                                     setState(() {
@@ -293,9 +308,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               ),
                               child: const Text(
                                 "Logout",
-                                style: TextStyle(color: Colors.white,fontSize: 18.0),
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 18.0),
                               ),
                               onPressed: () {
+                                Globals.timer?.cancel();
+                                Globals.checkTime(context);
                                 showDialog(
                                   context: context,
                                   builder: (BuildContext context) {
@@ -306,6 +324,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         TextButton(
                                           child: const Text("Yes"),
                                           onPressed: () async {
+                                            Globals.timer?.cancel();
+                                            Globals.checkTime(context);
                                             final cartContoller =
                                                 Provider.of<CartController>(
                                                     context,
@@ -329,6 +349,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                         TextButton(
                                           child: const Text("Cancel"),
                                           onPressed: () {
+                                            Globals.timer?.cancel();
+                                            Globals.checkTime(context);
                                             Navigator.of(context).pop();
                                           },
                                         ),

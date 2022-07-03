@@ -7,6 +7,7 @@ import 'package:flutter_beep/flutter_beep.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:restro_simplify/controller/CartController.dart';
+import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/dialog/product_dialog.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -154,6 +155,8 @@ class _PosPageState extends State<PosPage> {
                 TextButton(
                     child: const Text("Close"),
                     onPressed: () {
+                      Globals.timer?.cancel();
+                      Globals.checkTime(context);
                       Navigator.of(context).pop();
                       cart.clear();
                       selectedTable = null;
@@ -226,6 +229,8 @@ class _PosPageState extends State<PosPage> {
       return Scaffold(
         body: GestureDetector(
           onTap: () {
+            Globals.timer?.cancel();
+            Globals.checkTime(context);
             FocusScope.of(context).requestFocus(FocusNode());
           },
           child: SafeArea(
@@ -261,6 +266,8 @@ class _PosPageState extends State<PosPage> {
                                   // ),
                                   InkWell(
                                     onTap: () async {
+                                      Globals.timer?.cancel();
+                                      Globals.checkTime(context);
                                       await fetchTables();
                                       getTables(context);
                                     },
@@ -427,6 +434,10 @@ class _PosPageState extends State<PosPage> {
                                                           child:
                                                               GestureDetector(
                                                             onTap: () {
+                                                              Globals.timer
+                                                                  ?.cancel();
+                                                              Globals.checkTime(
+                                                                  context);
                                                               cart.removeSingleItem(cart
                                                                   .items.keys
                                                                   .toList()[cart
@@ -457,6 +468,10 @@ class _PosPageState extends State<PosPage> {
                                                         InkWell(
                                                           enableFeedback: true,
                                                           onTap: () {
+                                                            Globals.timer
+                                                                ?.cancel();
+                                                            Globals.checkTime(
+                                                                context);
                                                             cart.addItem(
                                                                 cart.items.keys
                                                                     .toList()[cart
@@ -528,6 +543,10 @@ class _PosPageState extends State<PosPage> {
                                                     width: 20,
                                                     child: InkWell(
                                                         onTap: () {
+                                                          Globals.timer
+                                                              ?.cancel();
+                                                          Globals.checkTime(
+                                                              context);
                                                           cart.removeItem(
                                                             cart.items.keys
                                                                 .toList()[cart
@@ -563,15 +582,40 @@ class _PosPageState extends State<PosPage> {
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Column(children: [
-                                    const Text('Total Quantity',style: TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),),
-                                    Text(cart.totalItemsCount.toString(),style: const TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),)
+                                    const Text(
+                                      'Total Quantity',
+                                      style: TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      cart.totalItemsCount.toString(),
+                                      style: const TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    )
                                   ]),
                                   Column(children: [
-                                    const Text('Gross Amount',style: TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),),
-                                    Text("Rs.${cart.totalAmount}",style: const TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),)
+                                    const Text(
+                                      'Gross Amount',
+                                      style: TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      "Rs.${cart.totalAmount}",
+                                      style: const TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    )
                                   ]),
                                   Column(children: [
-                                    const Text('No. of Guest',style: TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),),
+                                    const Text(
+                                      'No. of Guest',
+                                      style: TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                     Container(
                                         decoration: BoxDecoration(
                                             borderRadius:
@@ -580,7 +624,9 @@ class _PosPageState extends State<PosPage> {
                                         width: 70,
                                         height: 20,
                                         child: TextFormField(
-                                         style: const TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),
+                                          style: const TextStyle(
+                                              color: Colors.blueGrey,
+                                              fontWeight: FontWeight.bold),
                                           controller: guestController,
                                           keyboardType: TextInputType.number,
                                           decoration: const InputDecoration(
@@ -590,8 +636,18 @@ class _PosPageState extends State<PosPage> {
                                         ))
                                   ]),
                                   Column(children: [
-                                    const Text('Net Amount',style: TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),),
-                                    Text("Rs.${cart.totalAmount}",style:const TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),)
+                                    const Text(
+                                      'Net Amount',
+                                      style: TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      "Rs.${cart.totalAmount}",
+                                      style: const TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    )
                                   ]),
                                 ],
                               ),
@@ -612,6 +668,8 @@ class _PosPageState extends State<PosPage> {
                                           primary: Colors.redAccent,
                                         ),
                                         onPressed: () {
+                                          Globals.timer?.cancel();
+                                          Globals.checkTime(context);
                                           cart.clear();
                                           selectedTable = null;
                                           guestController.text = '';
@@ -641,6 +699,8 @@ class _PosPageState extends State<PosPage> {
                                         ),
                                         onPressed: _isButtonDisabled == 0
                                             ? () {
+                                                Globals.timer?.cancel();
+                                                Globals.checkTime(context);
                                                 Vibration.vibrate(
                                                     duration: 150,
                                                     amplitude: 1);
@@ -704,7 +764,10 @@ class _PosPageState extends State<PosPage> {
                                                   });
                                                 }
                                               }
-                                            : null,
+                                            : () {
+                                                Globals.timer?.cancel();
+                                                Globals.checkTime(context);
+                                              },
                                         child: Text(
                                           _isButtonDisabled == 1
                                               ? "Hold on..."
@@ -792,6 +855,8 @@ class _PosPageState extends State<PosPage> {
                                     ),
                                     InkWell(
                                       onTap: () {
+                                        Globals.timer?.cancel();
+                                        Globals.checkTime(context);
                                         filterController.clear();
                                         onSearchTextChanged('');
                                       },
@@ -827,6 +892,8 @@ class _PosPageState extends State<PosPage> {
                                       padding: const EdgeInsets.all(2.0),
                                       child: InkWell(
                                         onTap: () {
+                                          Globals.timer?.cancel();
+                                          Globals.checkTime(context);
                                           showDialog(
                                               context: context,
                                               builder: (BuildContext context) {
@@ -841,8 +908,7 @@ class _PosPageState extends State<PosPage> {
                                             borderRadius:
                                                 BorderRadius.circular(10),
                                           ),
-                                          child: 
-                                          Padding(
+                                          child: Padding(
                                             padding: const EdgeInsets.all(10.0),
                                             child: Center(
                                               child: Text(
@@ -850,12 +916,11 @@ class _PosPageState extends State<PosPage> {
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 13,
-                                                    fontWeight: FontWeight.bold),
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
                                             ),
                                           ),
-                                        
-                                        
                                         ),
                                       ),
                                     );
@@ -929,6 +994,8 @@ class _PosPageState extends State<PosPage> {
                           padding: const EdgeInsets.all(2.0),
                           child: InkWell(
                             onTap: () {
+                              Globals.timer?.cancel();
+                              Globals.checkTime(context);
                               Vibration.vibrate(duration: 150, amplitude: 1);
                               setState(() {
                                 selectedTable = table;

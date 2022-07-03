@@ -4,8 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:package_info/package_info.dart';
-
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:restro_simplify/screens/homescreen.dart';
 import '../models/login.dart';
 import 'dart:async';
@@ -39,7 +38,7 @@ class _LoginScreenState extends State<LoginScreen> {
   var data = Login();
   checkLogin() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var data = prefs.getBool('isLogin');
+    bool data = prefs.getBool('isLogin') ?? false;
     try {
       final res = await http.get(checkurl);
 
@@ -240,10 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           const Text(
                             "Restro Simplify",
-                            style: TextStyle(
-                              fontSize: 35,
-                             color: Colors.teal
-                            ),
+                            style: TextStyle(fontSize: 35, color: Colors.teal),
                           ),
                           const SizedBox(height: 30.0),
                           SizedBox(
@@ -330,33 +326,29 @@ class _LoginScreenState extends State<LoginScreen> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                               const SizedBox(
-                            height: 25.0,
-                            child: Text(
-                              "Powered By: Lumbini Tech Service Pvt. Ltd",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color:  Colors.teal,
-                                fontSize: 14,
+                              const SizedBox(
+                                height: 25.0,
+                                child: Text(
+                                  "Powered By: Lumbini Tech Service Pvt. Ltd",
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.teal,
+                                    fontSize: 14,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                         
-                          SizedBox(
-                            child: Text(
-                              "v" + versionName,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(
-                               color: Colors.teal,
-                                fontSize: 13,
+                              SizedBox(
+                                child: Text(
+                                  "v" + versionName,
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: Colors.teal,
+                                    fontSize: 13,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ),
-                       
                             ],
                           )
-                         
-                       
                         ],
                       ),
                     ),

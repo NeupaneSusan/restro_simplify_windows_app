@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_beep/flutter_beep.dart';
 import 'package:provider/provider.dart';
 import 'package:restro_simplify/controller/CartController.dart';
+import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/models/Product.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -114,6 +115,8 @@ class _ProductDialogState extends State<ProductDialog> {
                   ),
                   InkWell(
                     onTap: () {
+                      Globals.timer?.cancel();
+                      Globals.checkTime(context);
                       filterController.clear();
                       onSearchTextChanged('');
                     },
@@ -141,88 +144,96 @@ class _ProductDialogState extends State<ProductDialog> {
                 ],
               ),
               Expanded(
-                child:  prouctList.isEmpty ? const Center(
-                  child: Text('No Item Avaible'),
-                ) :  GridView.count(
-                    crossAxisCount: 6,
-                    padding: const EdgeInsets.all(4.0),
-                    children: searchProductList.map((product) {
-                      return Padding(
-                        padding: const EdgeInsets.all(2.0),
-                        child: InkWell(
-                          onTap: () {
-                            Vibration.vibrate(duration: 150, amplitude: 1);
-                            FlutterBeep.beep();
-                            final cart = Provider.of<CartController>(context,
-                                listen: false);
-                            cart.addItem(
-                                product.id.toString(),
-                                product.name.toString(),
-                                double.parse(product.price),
-                                int.parse(product.storeId));
-                          },
-                          child: Container(
-                            decoration:  BoxDecoration(
-                                color: Colors.blueGrey,
-                                borderRadius: BorderRadius.circular(10.0)),
-                            child: Column(children: [
-                              Card(
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(50)),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(50),
-                                  child: product.image != null
-                                      ? Image.network(product.image!,
-                                          height: 65, width: 65,
-                                          errorBuilder: (context, x, s) {
-                                          return Container(
-                                            height: 65,
-                                            width: 65,
-                                            padding: const EdgeInsets.all(8),
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                                border: Border.all(
+                child: prouctList.isEmpty
+                    ? const Center(
+                        child: Text('No Item Avaible'),
+                      )
+                    : GridView.count(
+                        crossAxisCount: 6,
+                        padding: const EdgeInsets.all(4.0),
+                        children: searchProductList.map((product) {
+                          return Padding(
+                            padding: const EdgeInsets.all(2.0),
+                            child: InkWell(
+                              onTap: () {
+                                Globals.timer?.cancel();
+                                Globals.checkTime(context);
+                                Vibration.vibrate(duration: 150, amplitude: 1);
+                                FlutterBeep.beep();
+                                final cart = Provider.of<CartController>(
+                                    context,
+                                    listen: false);
+                                cart.addItem(
+                                    product.id.toString(),
+                                    product.name.toString(),
+                                    double.parse(product.price),
+                                    int.parse(product.storeId));
+                              },
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.blueGrey,
+                                    borderRadius: BorderRadius.circular(10.0)),
+                                child: Column(children: [
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(50)),
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(50),
+                                      child: product.image != null
+                                          ? Image.network(product.image!,
+                                              height: 65, width: 65,
+                                              errorBuilder: (context, x, s) {
+                                              return Container(
+                                                height: 65,
+                                                width: 65,
+                                                padding:
+                                                    const EdgeInsets.all(8),
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            50),
+                                                    border: Border.all(
+                                                        color: Colors.white,
+                                                        width: 2)),
+                                                child: const InkWell(
+                                                  child: Icon(
+                                                    Icons.add,
                                                     color: Colors.white,
-                                                    width: 2)),
-                                            child:const InkWell(
-                                              child: Icon(
-                                                Icons.add,
-                                                color: Colors.white,
-                                              ),
+                                                  ),
+                                                ),
+                                              );
+                                            })
+                                          : Image.asset(
+                                              'assets/logo.png',
+                                              height: 65,
+                                              width: 65,
                                             ),
-                                          );
-                                        })
-                                      : Image.asset(
-                                          'assets/logo.png',
-                                          height: 65,
-                                          width: 65,
-                                        ),
-                                ),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(1.0),
+                                    child: Text(
+                                      product.name.toString(),
+                                      style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 11,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(1.0),
+                                    child: Text(
+                                      'Rs.' + product.price.toString(),
+                                      style: const TextStyle(
+                                          color: Colors.yellow, fontSize: 12),
+                                    ),
+                                  )
+                                ]),
                               ),
-                              Padding(
-                                padding: const EdgeInsets.all(1.0),
-                                child: Text(
-                                  product.name.toString(),
-                                  style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(1.0),
-                                child: Text(
-                                  'Rs.' + product.price.toString(),
-                                  style: const TextStyle(
-                                      color: Colors.yellow, fontSize: 12),
-                                ),
-                              )
-                            ]),
-                          ),
-                        ),
-                      );
-                    }).toList()),
+                            ),
+                          );
+                        }).toList()),
               ),
             ],
           ),

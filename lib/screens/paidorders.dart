@@ -7,6 +7,7 @@ import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
+import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PaidOrders extends StatefulWidget {
@@ -54,6 +55,8 @@ class _PaidOrdersState extends State<PaidOrders> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height;
+    double width = MediaQuery.of(context).size.width;
     // Set landscape orientation
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
@@ -63,16 +66,55 @@ class _PaidOrdersState extends State<PaidOrders> {
       appBar: AppBar(
         elevation: 0.0,
         backgroundColor: Colors.white10,
-        leading: IconButton(icon: const Icon(Icons.arrow_back,color: Colors.blueGrey,),onPressed: (){
-          Navigator.pop(context);
-        },),
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back,
+            color: Colors.blueGrey,
+          ),
+          onPressed: () {
+            Globals.timer?.cancel();
+            Globals.checkTime(context);
+            Navigator.pop(context);
+          },
+        ),
       ),
-      body: count == 0
-          ? const Center(
-              child: Center(
-                child: Text("No Orders Yet!"),
+      body: count == 0 ?
+      GestureDetector(
+        //  behavior: HitTestBehavior.opaque,
+        // // onTap: () {
+        // //   print('object');
+        // // },
+        child: AbsorbPointer(
+          absorbing: true,
+          child: Container(
+            height: 500,
+            child: ListView.builder(
+              itemCount: 10,
+              itemBuilder: (_, index) => GestureDetector(
+                onTap: () {
+                  print('$index');
+                },
+                child: Container(
+                  height: 100,
+                  margin: EdgeInsets.only(top: 10.0),
+                  color: index.isEven ? Colors.red : Colors.green,
+                ),
               ),
-            )
+            ),
+          ),
+        ),
+      )
+          // ? SizedBox(
+          //     height: height,
+          //     width: width,
+          //     child: GestureDetector(
+          //       onTap: () {
+          //         Globals.timer?.cancel();
+          //         Globals.checkTime(context);
+          //       },
+          //       child: Text("No Orders Yets!",textAlign: TextAlign.center,),
+          //     ),
+          //   )
           : ListView(
               children: <Widget>[
                 Padding(
@@ -95,6 +137,8 @@ class _PaidOrdersState extends State<PaidOrders> {
                       color: Colors.green,
                       child: InkWell(
                         onTap: () {
+                          Globals.timer?.cancel();
+                          Globals.checkTime(context);
                           Fluttertoast.showToast(
                               msg: "Bill already paid",
                               toastLength: Toast.LENGTH_LONG,

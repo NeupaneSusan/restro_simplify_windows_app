@@ -7,6 +7,7 @@ import 'package:flutter_beep/flutter_beep.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:restro_simplify/controller/CartController.dart';
+import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/dialog/product_dialog.dart';
 import 'package:restro_simplify/screens/homescreen.dart';
 
@@ -32,10 +33,10 @@ class _EditPosScreenState extends State<EditPosScreen> {
   TextEditingController guestController = TextEditingController();
   TextEditingController remarksController = TextEditingController();
   TextEditingController filterController = TextEditingController();
-  final GlobalKey<ScaffoldState> _scaffoldKey =  GlobalKey<ScaffoldState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   List<Category> categories = <Category>[];
- 
+
   List<Category> _searchResult = [];
 
   Category? selectedCategory;
@@ -45,7 +46,7 @@ class _EditPosScreenState extends State<EditPosScreen> {
   final url = "http://192.168.1.1/restroms/api";
   final imgUrl = "http://192.168.1.1/restroms/";
 
- Future<String> fetchCategories() async {
+  Future<String> fetchCategories() async {
     var res = await http.get(Uri.parse(url + '/categories'));
     if (res.statusCode == 200) {
       var jsonData = jsonDecode(res.body);
@@ -65,7 +66,6 @@ class _EditPosScreenState extends State<EditPosScreen> {
   }
 
   //fetch products
-  
 
 // toast
   void toast(message, color) {
@@ -76,9 +76,6 @@ class _EditPosScreenState extends State<EditPosScreen> {
         textColor: Colors.white,
         backgroundColor: color);
   }
-
- 
-
 
   var oldOrder;
   List<dynamic>? oldOrderItems;
@@ -173,6 +170,8 @@ class _EditPosScreenState extends State<EditPosScreen> {
                 TextButton(
                     child: const Text("Close"),
                     onPressed: () {
+                      Globals.timer?.cancel();
+                      Globals.checkTime(context);
                       Navigator.of(context).pop();
                       cart.clear();
                       Navigator.push(context,
@@ -205,7 +204,12 @@ class _EditPosScreenState extends State<EditPosScreen> {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile ||
         connectivityResult == ConnectivityResult.wifi) {
-      const EditPosScreen();
+      GestureDetector(
+          onTap: () {
+            Globals.timer?.cancel();
+            Globals.checkTime(context);
+          },
+          child: const EditPosScreen());
     } else {
       Scaffold(
         key: _scaffoldKey,
@@ -217,7 +221,7 @@ class _EditPosScreenState extends State<EditPosScreen> {
   }
 
   //search result
-onSearchTextChanged(String text) async {
+  onSearchTextChanged(String text) async {
     List<Category> myList = text.isEmpty
         ? categories
         : categories
@@ -233,7 +237,7 @@ onSearchTextChanged(String text) async {
   void initState() {
     fetchCategories();
     super.initState();
-    WidgetsBinding.instance!.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchOrder(widget.data['id'], widget.orderId);
     });
   }
@@ -260,7 +264,9 @@ onSearchTextChanged(String text) async {
         key: _scaffoldKey,
         body: GestureDetector(
           onTap: () {
-            FocusScope.of(context).requestFocus( FocusNode());
+            Globals.timer?.cancel();
+            Globals.checkTime(context);
+            FocusScope.of(context).requestFocus(FocusNode());
           },
           child: SafeArea(
               child: Container(
@@ -280,74 +286,70 @@ onSearchTextChanged(String text) async {
                         children: [
                           Row(children: [
                             Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Row(
-                            children: [
-                              // Container(
+                              padding: const EdgeInsets.all(8.0),
+                              child: Row(
+                                children: [
+                                  // Container(
 
-                              //   decoration: BoxDecoration(
-                              //       border:
-                              //           Border.all(color: Colors.grey)),
-                              //   child: Padding(
-                              //     padding: const EdgeInsets.all(8.0),
-                              //     child: Text('Table No.'),
-                              //   ),
-                              // ),
+                                  //   decoration: BoxDecoration(
+                                  //       border:
+                                  //           Border.all(color: Colors.grey)),
+                                  //   child: Padding(
+                                  //     padding: const EdgeInsets.all(8.0),
+                                  //     child: Text('Table No.'),
+                                  //   ),
+                                  // ),
 
-                              Container(
-                                  width: 100,
-                                  height: 35,
-                                  decoration: BoxDecoration(
-                                      color: Colors.teal,
-                                      border: Border.all(
-                                          color: Colors.grey)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Center(
-                                        child: Text(
-                                      oldOrder != null
-                                          ? oldOrder['table_name']
-                                          : '',
-                                      style: const TextStyle(
-                                          color: Colors.white),
-                                    )),
-                                  )),
+                                  Container(
+                                      width: 100,
+                                      height: 35,
+                                      decoration: BoxDecoration(
+                                          color: Colors.teal,
+                                          border:
+                                              Border.all(color: Colors.grey)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(8.0),
+                                        child: Center(
+                                            child: Text(
+                                          oldOrder != null
+                                              ? oldOrder['table_name']
+                                              : '',
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        )),
+                                      )),
 
-                              const SizedBox(width: 10),
-                              Container(
-                                height: 35,
-                                decoration: BoxDecoration(
-                                    border:
-                                        Border.all(color: Colors.grey)),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(8.0),
-                                  child: Icon(
-                                    Icons.edit,
-                                    size: 16,
-                                    color: Colors.grey,
+                                  const SizedBox(width: 10),
+                                  Container(
+                                    height: 35,
+                                    decoration: BoxDecoration(
+                                        border: Border.all(color: Colors.grey)),
+                                    child: const Padding(
+                                      padding: EdgeInsets.all(8.0),
+                                      child: Icon(
+                                        Icons.edit,
+                                        size: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              Container(
-                                width:
-                                    MediaQuery.of(context).size.width *
+                                  Container(
+                                    width: MediaQuery.of(context).size.width *
                                         0.41,
-                                decoration: BoxDecoration(
-                                    color: Colors.white30,
-                                    border:
-                                        Border.all(color: Colors.grey)),
-                                child: TextFormField(
-                                  controller: remarksController,
-                                  decoration: const InputDecoration(
-                                      isDense: true,
-                                      contentPadding:
-                                          EdgeInsets.all(6.5),
-                                      hintText: 'Remarks',
-                                      border: InputBorder.none),
-                                ),
+                                    decoration: BoxDecoration(
+                                        color: Colors.white30,
+                                        border: Border.all(color: Colors.grey)),
+                                    child: TextFormField(
+                                      controller: remarksController,
+                                      decoration: const InputDecoration(
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.all(6.5),
+                                          hintText: 'Remarks',
+                                          border: InputBorder.none),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                            ),
                             ),
                           ]),
                           Container(
@@ -466,6 +468,10 @@ onSearchTextChanged(String text) async {
                                                           child:
                                                               GestureDetector(
                                                             onTap: () {
+                                                              Globals.timer
+                                                                  ?.cancel();
+                                                              Globals.checkTime(
+                                                                  context);
                                                               Vibration.vibrate(
                                                                   duration: 150,
                                                                   amplitude: 1);
@@ -510,6 +516,10 @@ onSearchTextChanged(String text) async {
                                                             .toString()),
                                                         GestureDetector(
                                                           onTap: () {
+                                                            Globals.timer
+                                                                ?.cancel();
+                                                            Globals.checkTime(
+                                                                context);
                                                             Vibration.vibrate(
                                                                 duration: 150,
                                                                 amplitude: 1);
@@ -593,6 +603,10 @@ onSearchTextChanged(String text) async {
                                                             0
                                                         ? InkWell(
                                                             onTap: () {
+                                                              Globals.timer
+                                                                  ?.cancel();
+                                                              Globals.checkTime(
+                                                                  context);
                                                               Vibration.vibrate(
                                                                   duration: 150,
                                                                   amplitude: 1);
@@ -613,6 +627,10 @@ onSearchTextChanged(String text) async {
                                                                     Colors.red))
                                                         : InkWell(
                                                             onTap: () {
+                                                              Globals.timer
+                                                                  ?.cancel();
+                                                              Globals.checkTime(
+                                                                  context);
                                                               Vibration.vibrate(
                                                                   duration: 150,
                                                                   amplitude: 1);
@@ -644,19 +662,52 @@ onSearchTextChanged(String text) async {
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Column(children: [
-                                    const Text('Total Quantity',style: TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),),
-                                    Text(cart.totalItemsCount.toString(),style: const TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),)
+                                    const Text(
+                                      'Total Quantity',
+                                      style: TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      cart.totalItemsCount.toString(),
+                                      style: const TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    )
                                   ]),
                                   Column(children: [
-                                    const Text('Gross Amount',style: TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),),
-                                    Text("Rs.${cart.totalAmount}",style: const TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),)
+                                    const Text(
+                                      'Gross Amount',
+                                      style: TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      "Rs.${cart.totalAmount}",
+                                      style: const TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    )
                                   ]),
                                   Column(children: [
-                                    const Text('Discount Amount',style: TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold)),
-                                    Text("Rs.${discount.toString()}",style: const TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),)
+                                    const Text('Discount Amount',
+                                        style: TextStyle(
+                                            color: Colors.blueGrey,
+                                            fontWeight: FontWeight.bold)),
+                                    Text(
+                                      "Rs.${discount.toString()}",
+                                      style: const TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    )
                                   ]),
                                   Column(children: [
-                                    const Text('No. of Guest',style: TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),),
+                                    const Text(
+                                      'No. of Guest',
+                                      style: TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                     Container(
                                         decoration: BoxDecoration(
                                             borderRadius:
@@ -665,20 +716,30 @@ onSearchTextChanged(String text) async {
                                         width: 70,
                                         height: 24,
                                         child: TextFormField(
-                                           style: const TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),
+                                          style: const TextStyle(
+                                              color: Colors.blueGrey,
+                                              fontWeight: FontWeight.bold),
                                           controller: guestController,
                                           keyboardType: TextInputType.number,
-                                        
                                           decoration: const InputDecoration(
-                                          
                                               border: InputBorder.none),
                                         ))
                                   ]),
                                   Column(children: [
-                                    const Text('Net Amount',style: TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),),
-                                    Text("Rs." +
-                                        (cart.totalAmount - (discount))
-                                            .toString(),style: const TextStyle(color: Colors.blueGrey,fontWeight: FontWeight.bold),)
+                                    const Text(
+                                      'Net Amount',
+                                      style: TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text(
+                                      "Rs." +
+                                          (cart.totalAmount - (discount))
+                                              .toString(),
+                                      style: const TextStyle(
+                                          color: Colors.blueGrey,
+                                          fontWeight: FontWeight.bold),
+                                    )
                                   ]),
                                 ],
                               ),
@@ -698,6 +759,8 @@ onSearchTextChanged(String text) async {
                                           primary: Colors.redAccent,
                                         ),
                                         onPressed: () {
+                                          Globals.timer?.cancel();
+                                          Globals.checkTime(context);
                                           cart.clear();
                                           Navigator.push(context,
                                               MaterialPageRoute(
@@ -722,32 +785,34 @@ onSearchTextChanged(String text) async {
                                         ),
                                         onPressed: _isButtonDisabled == 0
                                             ? () {
+                                                Globals.timer?.cancel();
+                                                Globals.checkTime(context);
                                                 Vibration.vibrate(
                                                     duration: 150,
                                                     amplitude: 1);
 
                                                 var cartItems = [];
-                                                cart.items.forEach((key,
-                                                        value) =>
-                                                    {
-                                                      cartItems.add({
-                                                        'product_id': key,
-                                                        'quantity':
-                                                            value.quantity,
-                                                        'rate': value.rate,
-                                                        'amount':
-                                                            value.quantity! *
+                                                cart.items
+                                                    .forEach((key, value) => {
+                                                          cartItems.add({
+                                                            'product_id': key,
+                                                            'quantity':
+                                                                value.quantity,
+                                                            'rate': value.rate,
+                                                            'amount': value
+                                                                    .quantity! *
                                                                 value.rate!,
-                                                        'product_store_id':
-                                                            value.storeId,
-                                                        'plus_quantity':
-                                                            value.plusQuantity,
-                                                        'is_new':
-                                                            value.isNew ?? 0,
-                                                        'order_id':
-                                                            oldOrder['id']
-                                                      })
-                                                    });
+                                                            'product_store_id':
+                                                                value.storeId,
+                                                            'plus_quantity': value
+                                                                .plusQuantity,
+                                                            'is_new':
+                                                                value.isNew ??
+                                                                    0,
+                                                            'order_id':
+                                                                oldOrder['id']
+                                                          })
+                                                        });
 
                                                 if (oldOrder['table_id'] ==
                                                         null ||
@@ -764,10 +829,13 @@ onSearchTextChanged(String text) async {
                                                     var body = jsonEncode(<
                                                         String, dynamic>{
                                                       'order_items': cartItems,
-                                                      'gross_amount':
-                                                          cart.totalAmount.toString(),
+                                                      'gross_amount': cart
+                                                          .totalAmount
+                                                          .toString(),
                                                       'net_amount':
-                                                          (cart.totalAmount - discount).toString(),
+                                                          (cart.totalAmount -
+                                                                  discount)
+                                                              .toString(),
                                                       'user_id':
                                                           widget.data['id'],
                                                       'store_id': widget
@@ -789,12 +857,16 @@ onSearchTextChanged(String text) async {
                                                   }
                                                 }
                                               }
-                                            : null,
+                                            : () {
+                                                Globals.timer?.cancel();
+                                                Globals.checkTime(context);
+                                              },
                                         child: Text(
                                           _isButtonDisabled == 1
                                               ? "Hold on..."
                                               : "Update Now",
-                                          style: const TextStyle(color: Colors.white),
+                                          style: const TextStyle(
+                                              color: Colors.white),
                                         ),
                                       ),
                                     ),
@@ -813,7 +885,8 @@ onSearchTextChanged(String text) async {
                     child: Container(
                       decoration: const BoxDecoration(
                           border: Border(
-                              top: BorderSide(color: Colors.blueGrey, width: 5)),
+                              top:
+                                  BorderSide(color: Colors.blueGrey, width: 5)),
                           color: Colors.white),
                       child: ListView(
                         children: [
@@ -875,6 +948,8 @@ onSearchTextChanged(String text) async {
                                     ),
                                     InkWell(
                                       onTap: () {
+                                        Globals.timer?.cancel();
+                                        Globals.checkTime(context);
                                         filterController.clear();
                                         onSearchTextChanged('');
                                       },
@@ -910,6 +985,8 @@ onSearchTextChanged(String text) async {
                                       padding: const EdgeInsets.all(2.0),
                                       child: InkWell(
                                         onTap: () {
+                                          Globals.timer?.cancel();
+                                          Globals.checkTime(context);
                                           showDialog(
                                               context: context,
                                               builder: (BuildContext context) {
@@ -919,12 +996,11 @@ onSearchTextChanged(String text) async {
                                               });
                                         },
                                         child: Container(
-                                          decoration:  BoxDecoration(
+                                          decoration: BoxDecoration(
                                               color: Colors.blueGrey,
-                                              borderRadius: BorderRadius.circular(10) ),
-                                          child:
-                                          
-                                           Padding(
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          child: Padding(
                                             padding: const EdgeInsets.all(10.0),
                                             child: Center(
                                               child: Text(
@@ -932,13 +1008,11 @@ onSearchTextChanged(String text) async {
                                                 style: const TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 13,
-                                                    fontWeight: FontWeight.bold),
+                                                    fontWeight:
+                                                        FontWeight.bold),
                                               ),
                                             ),
                                           ),
-                                        
-                                        
-                                        
                                         ),
                                       ),
                                     );
