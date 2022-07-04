@@ -1,17 +1,16 @@
-// ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_beep/flutter_beep.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vibration/vibration.dart';
-// import 'package:restro_ms/screens/loginscreen.dart';
-// import 'package:restro_ms/screens/paidorders.dart';
-// import 'package:restro_ms/screens/fonepay.dart';
+
+
 import 'editpos.dart';
 import 'package:flutter/services.dart';
 
@@ -36,6 +35,8 @@ class _OrderScreenState extends State<OrderScreen> {
 
     final response =
         await http.get(Uri.parse(url + "/tableOrders/getUnpaidOrders/$id"));
+        print(response.statusCode);
+        print(response.body);
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body);
 
@@ -62,11 +63,11 @@ class _OrderScreenState extends State<OrderScreen> {
         .get(Uri.parse(url + "/tableOrders/requestBill/$id/$orderId"));
 
     if (response.statusCode == 200) {
-      Fluttertoast.showToast(
-          msg: "Bill Successfully Requested",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
-          textColor: Colors.white,
+     showToast(
+           "Bill Successfully Requested",
+            context: context,
+                                  position: StyledToastPosition.center,  
+                                    duration: const Duration(seconds: 2),
           backgroundColor: Colors.green);
       getOrderData();
       return "success";
@@ -123,8 +124,8 @@ class _OrderScreenState extends State<OrderScreen> {
                     children: orders!.map((data) {
                       return InkWell(
                         onLongPress: () {
-                          Vibration.vibrate(duration: 150, amplitude: 1);
-
+                         
+                           FlutterBeep.beep();
                           _neverSatisfied(data['id'], data['user_id'])
                               .then((value) {});
                         },
@@ -152,19 +153,19 @@ class _OrderScreenState extends State<OrderScreen> {
                                 }));
                               } else if (res.statusCode == 406) {
                                 var message = json.decode(res.body)['message'];
-                                Fluttertoast.showToast(
-                                    msg: message,
-                                    toastLength: Toast.LENGTH_LONG,
-                                    gravity: ToastGravity.CENTER,
-                                    textColor: Colors.white,
+                               showToast(
+                                   message,
+                                    context: context,
+                                  position: StyledToastPosition.center,  
+                                    duration: const Duration(seconds: 2),
                                     backgroundColor: Colors.green);
                               } else if (res.statusCode == 401) {
                                 var message = json.decode(res.body)['message'];
-                                Fluttertoast.showToast(
-                                    msg: message,
-                                    toastLength: Toast.LENGTH_LONG,
-                                    gravity: ToastGravity.CENTER,
-                                    textColor: Colors.white,
+                               showToast(
+                                    message,
+                                     context: context,
+                                  position: StyledToastPosition.center,  
+                                    duration: const Duration(seconds: 2),
                                     backgroundColor: Colors.orange);
                               }
                             },

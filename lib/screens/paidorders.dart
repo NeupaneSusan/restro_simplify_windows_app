@@ -1,8 +1,9 @@
 // ignore_for_file: prefer_typing_uninitialized_variables
 
 import 'package:flutter/material.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
-import 'package:fluttertoast/fluttertoast.dart';
+
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
@@ -133,11 +134,12 @@ class _PaidOrdersState extends State<PaidOrders> {
                         onTap: () {
                           Globals.timer?.cancel();
                           Globals.checkTime(context);
-                          Fluttertoast.showToast(
-                              msg: "Bill already paid",
-                              toastLength: Toast.LENGTH_LONG,
-                              gravity: ToastGravity.CENTER,
-                              textColor: Colors.white,
+                      showToast(
+                               "Bill already paid",
+                                context: context,
+                                  position: StyledToastPosition.center,  
+                                    duration: const Duration(seconds: 2),
+ 
                               backgroundColor: Colors.green);
                         },
                         child: Center(

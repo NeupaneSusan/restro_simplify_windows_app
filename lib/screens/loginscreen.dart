@@ -3,10 +3,12 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
+
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:restro_simplify/controller/TimeController.dart';
-import 'package:restro_simplify/screens/homescreen.dart';
+import 'package:restro_simplify/screens/firstScreen.dart';
+
 import '../models/login.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -54,17 +56,17 @@ class _LoginScreenState extends State<LoginScreen> {
       setState(() {
         response = false;
       });
-      Fluttertoast.showToast(
-          msg: "SocketExcepton",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
-          textColor: Colors.white,
+      showToast(
+          "SocketExcepton",
+            context: context,
+                                  position: StyledToastPosition.center,  
+                                    duration: const Duration(seconds: 2),
           backgroundColor: Colors.red);
     }
     if (data == true && response == true) {
       Navigator.of(context)
           .pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
-        return const HomeScreen();
+        return const MyFirstScreen();
       }));
     }
   }
@@ -115,15 +117,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
         Navigator.of(context)
             .pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
-          return const HomeScreen();
+          return const MyFirstScreen();
         }));
         return true;
       } else {
-        Fluttertoast.showToast(
-            msg: "Credentials doesnot matched!",
-            toastLength: Toast.LENGTH_LONG,
-            gravity: ToastGravity.CENTER,
-            textColor: Colors.white,
+    showToast(
+             "Credentials doesnot matched!",
+            context: context,
+                                  position: StyledToastPosition.center,  
+                                    duration: const Duration(seconds: 2),
             backgroundColor: Colors.red);
         setState(() {
           isLoading = false;
@@ -131,11 +133,9 @@ class _LoginScreenState extends State<LoginScreen> {
         return false;
       }
     } on SocketException {
-      Fluttertoast.showToast(
-          msg: "System is Offline",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.CENTER,
-          textColor: Colors.white,
+showToast(
+          "System is Offline",
+         
           backgroundColor: Colors.red);
       setState(() {
         isLoading = false;
@@ -301,11 +301,11 @@ class _LoginScreenState extends State<LoginScreen> {
                                             .requestFocus(FocusNode());
                                         if (email.text.isEmpty ||
                                             password.text.isEmpty) {
-                                          Fluttertoast.showToast(
-                                              msg: "Credentials must required",
-                                              toastLength: Toast.LENGTH_LONG,
-                                              gravity: ToastGravity.CENTER,
-                                              textColor: Colors.white,
+                                          showToast(
+                                               "Credentials must required",
+                                             context: context,
+                                  position: StyledToastPosition.center,  
+                                    duration: const Duration(seconds: 2),
                                               backgroundColor: Colors.red);
                                         } else {
                                           setState(() {

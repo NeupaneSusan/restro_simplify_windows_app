@@ -11,23 +11,27 @@ import 'package:flutter/services.dart';
 
 
 import 'package:restro_simplify/controller/TimeController.dart';
+import 'package:restro_simplify/models/Tables.dart';
 import 'package:restro_simplify/screens/orderscreen.dart';
 
 import 'package:restro_simplify/screens/pos.dart';
 import 'package:restro_simplify/screens/profile.dart';
-import 'package:restro_simplify/screens/slider.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'package:wakelock/wakelock.dart';
 
+// ignore: must_be_immutable
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  Tables? selectedTable;
+ HomeScreen({Key? key,this.selectedTable}) : super(key: key);
 
   @override
   _HomeScreenState createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
+  Tables? selectedTable;
   dynamic userData;
   Uint8List? byte;
   Uint8List bytess = Uint8List.fromList([]);
@@ -104,20 +108,14 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
   void initState() {
     Wakelock.enable();
     super.initState();
-    _pageController = PageController();
     getUserFromLocalStorage();
-    WidgetsBinding.instance.addObserver(this);
+    _pageController = PageController();
+    Globals.timer?.cancel();
     Globals.checkTime(context);
+    selectedTable = widget.selectedTable;
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.inactive) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (_) => const MySlider()));
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -143,7 +141,8 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
       child: WillPopScope(
         onWillPop: () async {
           _alert(context);
-    
+     Globals.timer?.cancel();
+            Globals.checkTime(context);
           return false;
         },
         child: Scaffold(
@@ -157,7 +156,7 @@ class _HomeScreenState extends State<HomeScreen> with WidgetsBindingObserver {
                   setState(() => _selectedIndex = index);
                 },
                 children: <Widget>[
-                  PosPage(data: userData),
+                  PosPage(data: userData,selectedTable : selectedTable!),
                   OrderScreen(data: userData),
                   ProfileScreen(
                     data: userData,

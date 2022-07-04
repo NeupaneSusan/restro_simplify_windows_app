@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_beep/flutter_beep.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:provider/provider.dart';
 import 'package:restro_simplify/controller/CartController.dart';
 import 'package:restro_simplify/controller/TimeController.dart';
@@ -12,7 +12,7 @@ import 'package:restro_simplify/dialog/product_dialog.dart';
 import 'package:restro_simplify/screens/homescreen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vibration/vibration.dart';
+
 
 import '../models/Category.dart';
 
@@ -69,11 +69,12 @@ class _EditPosScreenState extends State<EditPosScreen> {
 
 // toast
   void toast(message, color) {
-    Fluttertoast.showToast(
-        msg: message,
-        toastLength: Toast.LENGTH_LONG,
-        gravity: ToastGravity.CENTER,
-        textColor: Colors.white,
+  showToast(
+         message,
+         
+           context: context,
+                                  position: StyledToastPosition.center,  
+                                    duration: const Duration(seconds: 2),
         backgroundColor: color);
   }
 
@@ -140,7 +141,7 @@ class _EditPosScreenState extends State<EditPosScreen> {
       cart.clear();
       guestController.text = 0.toString();
       Navigator.push(context, MaterialPageRoute(builder: (context) {
-        return const HomeScreen();
+        return  HomeScreen(selectedTable: null,);
       }));
       return true;
     } else if (res.statusCode == 406) {
@@ -176,7 +177,7 @@ class _EditPosScreenState extends State<EditPosScreen> {
                       cart.clear();
                       Navigator.push(context,
                           MaterialPageRoute(builder: (context) {
-                        return const HomeScreen();
+                        return  HomeScreen(selectedTable: null,);
                       }));
                     }),
                 const SizedBox(width: 180.0),
@@ -262,722 +263,710 @@ class _EditPosScreenState extends State<EditPosScreen> {
     return Consumer<CartController>(builder: (context, cart, child) {
       return Scaffold(
         key: _scaffoldKey,
-        body: GestureDetector(
-          onTap: () {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-            FocusScope.of(context).requestFocus(FocusNode());
-          },
-          child: SafeArea(
-              child: Container(
-            margin: const EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 0),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 6,
-                  child: Card(
-                    elevation: 5,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                          color: Colors.white,
-                          border: Border(
-                              top: BorderSide(color: Colors.teal, width: 5))),
-                      child: ListView(
-                        children: [
-                          Row(children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Row(
-                                children: [
-                                  // Container(
-
-                                  //   decoration: BoxDecoration(
-                                  //       border:
-                                  //           Border.all(color: Colors.grey)),
-                                  //   child: Padding(
-                                  //     padding: const EdgeInsets.all(8.0),
-                                  //     child: Text('Table No.'),
-                                  //   ),
-                                  // ),
-
-                                  Container(
-                                      width: 100,
+        body: SingleChildScrollView(
+          child: SizedBox(
+             width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height,
+          child: GestureDetector(
+            onTap: () {
+              Globals.timer?.cancel();
+              Globals.checkTime(context);
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: SafeArea(
+                child: Container(
+              margin: const EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 0),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 6,
+                    child: Card(
+                      elevation: 5,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                            color: Colors.white,
+                            border: Border(
+                                top: BorderSide(color: Colors.teal, width: 5))),
+                        child: ListView(
+                          children: [
+                            Row(children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    
+        
+                                    Container(
+                                        width: 100,
+                                        height: 35,
+                                        decoration: BoxDecoration(
+                                            color: Colors.teal,
+                                            border:
+                                                Border.all(color: Colors.grey)),
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Center(
+                                              child: Text(
+                                            oldOrder != null
+                                                ? oldOrder['table_name']
+                                                : '',
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          )),
+                                        )),
+        
+                                    const SizedBox(width: 10),
+                                    Container(
                                       height: 35,
                                       decoration: BoxDecoration(
-                                          color: Colors.teal,
-                                          border:
-                                              Border.all(color: Colors.grey)),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Center(
-                                            child: Text(
-                                          oldOrder != null
-                                              ? oldOrder['table_name']
-                                              : '',
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        )),
-                                      )),
-
-                                  const SizedBox(width: 10),
-                                  Container(
-                                    height: 35,
-                                    decoration: BoxDecoration(
-                                        border: Border.all(color: Colors.grey)),
-                                    child: const Padding(
-                                      padding: EdgeInsets.all(8.0),
-                                      child: Icon(
-                                        Icons.edit,
-                                        size: 16,
-                                        color: Colors.grey,
+                                          border: Border.all(color: Colors.grey)),
+                                      child: const Padding(
+                                        padding: EdgeInsets.all(8.0),
+                                        child: Icon(
+                                          Icons.edit,
+                                          size: 16,
+                                          color: Colors.grey,
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                  Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.41,
-                                    decoration: BoxDecoration(
-                                        color: Colors.white30,
-                                        border: Border.all(color: Colors.grey)),
-                                    child: TextFormField(
-                                      controller: remarksController,
-                                      decoration: const InputDecoration(
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.all(6.5),
-                                          hintText: 'Remarks',
-                                          border: InputBorder.none),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.41,
+                                      decoration: BoxDecoration(
+                                          color: Colors.white30,
+                                          border: Border.all(color: Colors.grey)),
+                                      child: TextFormField(
+                                        controller: remarksController,
+                                        decoration: const InputDecoration(
+                                            isDense: true,
+                                            contentPadding: EdgeInsets.all(6.5),
+                                            hintText: 'Remarks',
+                                            border: InputBorder.none),
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
+                              ),
+                            ]),
+                            Container(
+                              color: Colors.blueGrey,
+                              child: Padding(
+                                padding: const EdgeInsets.all(6.0),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: const [
+                                      SizedBox(
+                                        width: 130,
+                                        child: Text(
+                                          'Item Name',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 100,
+                                        child: Center(
+                                          child: Text(
+                                            'Quantity',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 60,
+                                        child: Text(
+                                          'Price',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 70,
+                                        child: Center(
+                                          child: Text(
+                                            'Amount',
+                                            style: TextStyle(color: Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(
+                                        width: 20,
+                                        child: Text(
+                                          'X',
+                                          style: TextStyle(color: Colors.white),
+                                        ),
+                                      ),
+                                    ]),
                               ),
                             ),
-                          ]),
-                          Container(
-                            color: Colors.blueGrey,
-                            child: Padding(
-                              padding: const EdgeInsets.all(6.0),
-                              child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceEvenly,
-                                  children: const [
-                                    SizedBox(
-                                      width: 130,
-                                      child: Text(
-                                        'Item Name',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 100,
-                                      child: Center(
-                                        child: Text(
-                                          'Quantity',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 60,
-                                      child: Text(
-                                        'Price',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 70,
-                                      child: Center(
-                                        child: Text(
-                                          'Amount',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      width: 20,
-                                      child: Text(
-                                        'X',
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    ),
-                                  ]),
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                border: Border.all(color: Colors.teal[100]!)),
-                            width: MediaQuery.of(context).size.width * 0.6,
-                            height: MediaQuery.of(context).size.height * 0.61,
-                            child: ListView(
-                              children: [
-                                SizedBox(
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.6,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(1.0),
-                                    child: ListView.builder(
-                                      scrollDirection: Axis.vertical,
-                                      itemCount: cart.items.length,
-                                      itemBuilder:
-                                          (BuildContext context, int i) => Card(
-                                        elevation: 1,
-                                        color: cart.items.values
-                                                    .toList()[
-                                                        cart.items.length -
-                                                            i -
-                                                            1]
-                                                    .isNew ==
-                                                1
-                                            ? Colors.blueGrey
-                                            : Colors.blueGrey[300],
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(1.0),
-                                          child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceEvenly,
-                                              children: [
-                                                SizedBox(
-                                                  width: 130,
-                                                  child: Text(
-                                                    cart.items.values
-                                                        .toList()[
-                                                            cart.items.length -
-                                                                i -
-                                                                1]
-                                                        .name!,
-                                                    style: const TextStyle(
-                                                        color: Colors.white),
-                                                  ),
+                            Expanded(
+                              child: Container(
+                                decoration: BoxDecoration(
+                                    color: Colors.grey[100],
+                                    border: Border.all(color: Colors.teal[100]!)),
+                                
+                                child: Padding(
+                                  padding: const EdgeInsets.all(1.0),
+                                  child: ListView.builder(
+                                    scrollDirection: Axis.vertical,
+                                    itemCount: cart.items.length,
+                                    itemBuilder:
+                                        (BuildContext context, int i) => Card(
+                                      elevation: 1,
+                                      color: cart.items.values
+                                                  .toList()[
+                                                      cart.items.length -
+                                                          i -
+                                                          1]
+                                                  .isNew ==
+                                              1
+                                          ? Colors.blueGrey
+                                          : Colors.blueGrey[300],
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(1.0),
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            children: [
+                                              SizedBox(
+                                                width: 130,
+                                                child: Text(
+                                                  cart.items.values
+                                                      .toList()[
+                                                          cart.items.length -
+                                                              i -
+                                                              1]
+                                                      .name!,
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
                                                 ),
-                                                Container(
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.white38,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
-                                                  width: 100,
-                                                  child: Row(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .spaceBetween,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .all(5.0),
-                                                          child:
-                                                              GestureDetector(
-                                                            onTap: () {
-                                                              Globals.timer
-                                                                  ?.cancel();
-                                                              Globals.checkTime(
-                                                                  context);
-                                                              Vibration.vibrate(
-                                                                  duration: 150,
-                                                                  amplitude: 1);
-                                                              FlutterBeep
-                                                                  .beep();
-                                                              if (cart.items
-                                                                      .values
-                                                                      .toList()[
-                                                                          cart.items.length -
-                                                                              i -
-                                                                              1]
-                                                                      .quantity! >
-                                                                  cart.items
-                                                                      .values
-                                                                      .toList()[
-                                                                          cart.items.length -
-                                                                              i -
-                                                                              1]
-                                                                      .oldQuantity!) {
-                                                                cart.removeEditSingleItem(cart
-                                                                    .items.keys
-                                                                    .toList()[cart
-                                                                        .items
-                                                                        .length -
-                                                                    i -
-                                                                    1]);
-                                                              }
-                                                            },
-                                                            child: const Icon(
-                                                              Icons
-                                                                  .remove_circle_outline,
-                                                              color: Colors.red,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        Text(cart.items.values
-                                                            .toList()[cart.items
-                                                                    .length -
-                                                                i -
-                                                                1]
-                                                            .quantity
-                                                            .toString()),
-                                                        GestureDetector(
+                                              ),
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    color: Colors.white38,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10)),
+                                                width: 100,
+                                                child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .all(5.0),
+                                                        child:
+                                                            GestureDetector(
                                                           onTap: () {
                                                             Globals.timer
                                                                 ?.cancel();
                                                             Globals.checkTime(
                                                                 context);
-                                                            Vibration.vibrate(
-                                                                duration: 150,
-                                                                amplitude: 1);
-                                                            FlutterBeep.beep();
-                                                            // playAudio();
-                                                            cart.addItem(
-                                                              cart.items.keys
+                                                           
+                                                            FlutterBeep
+                                                                .beep();
+                                                            if (cart.items
+                                                                    .values
+                                                                    .toList()[
+                                                                        cart.items.length -
+                                                                            i -
+                                                                            1]
+                                                                    .quantity! >
+                                                                cart.items
+                                                                    .values
+                                                                    .toList()[
+                                                                        cart.items.length -
+                                                                            i -
+                                                                            1]
+                                                                    .oldQuantity!) {
+                                                              cart.removeEditSingleItem(cart
+                                                                  .items.keys
                                                                   .toList()[cart
-                                                                          .items
-                                                                          .length -
-                                                                      i -
-                                                                      1]
-                                                                  .toString(),
-                                                              cart.items.values
-                                                                  .toList()[cart
-                                                                          .items
-                                                                          .length -
-                                                                      i -
-                                                                      1]
-                                                                  .name,
-                                                              double.parse(cart
-                                                                  .items.values
-                                                                  .toList()[cart
-                                                                          .items
-                                                                          .length -
-                                                                      i -
-                                                                      1]
-                                                                  .rate
-                                                                  .toString()),
-                                                              cart.items.values
-                                                                  .toList()[cart
-                                                                          .items
-                                                                          .length -
-                                                                      i -
-                                                                      1]
-                                                                  .storeId,
-                                                            );
+                                                                      .items
+                                                                      .length -
+                                                                  i -
+                                                                  1]);
+                                                            }
                                                           },
                                                           child: const Icon(
                                                             Icons
-                                                                .add_circle_outline,
-                                                            color: Colors.green,
+                                                                .remove_circle_outline,
+                                                            color: Colors.red,
                                                           ),
                                                         ),
-                                                        const SizedBox(width: 1)
-                                                      ]),
-                                                ),
-                                                SizedBox(
-                                                  width: 60,
-                                                  child: Text(
-                                                    cart.items.values
-                                                        .toList()[
-                                                            cart.items.length -
-                                                                i -
-                                                                1]
-                                                        .rate
-                                                        .toString(),
-                                                    style: const TextStyle(
-                                                        color: Colors.white),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                  width: 70,
-                                                  child: Center(
-                                                    child: Text(
-                                                      "${cart.items.values.toList()[cart.items.length - i - 1].rate! * cart.items.values.toList()[cart.items.length - i - 1].quantity!}",
-                                                      style: const TextStyle(
-                                                          color: Colors.white),
-                                                    ),
-                                                  ),
-                                                ),
-                                                SizedBox(
-                                                    width: 20,
-                                                    child: cart.items.values
+                                                      ),
+                                                      Text(cart.items.values
+                                                          .toList()[cart.items
+                                                                  .length -
+                                                              i -
+                                                              1]
+                                                          .quantity
+                                                          .toString()),
+                                                      GestureDetector(
+                                                        onTap: () {
+                                                          Globals.timer
+                                                              ?.cancel();
+                                                          Globals.checkTime(
+                                                              context);
+                                                          
+                                                          FlutterBeep.beep();
+                                                          // playAudio();
+                                                          cart.addItem(
+                                                            cart.items.keys
                                                                 .toList()[cart
                                                                         .items
                                                                         .length -
                                                                     i -
                                                                     1]
-                                                                .oldQuantity ==
-                                                            0
-                                                        ? InkWell(
-                                                            onTap: () {
-                                                              Globals.timer
-                                                                  ?.cancel();
-                                                              Globals.checkTime(
-                                                                  context);
-                                                              Vibration.vibrate(
-                                                                  duration: 150,
-                                                                  amplitude: 1);
-                                                              FlutterBeep
-                                                                  .beep();
-                                                              cart.removeItem(
-                                                                cart.items.keys
-                                                                    .toList()[cart
+                                                                .toString(),
+                                                            cart.items.values
+                                                                .toList()[cart
                                                                         .items
                                                                         .length -
                                                                     i -
-                                                                    1],
-                                                              );
-                                                            },
-                                                            child: const Icon(
-                                                                Icons.delete,
-                                                                color:
-                                                                    Colors.red))
-                                                        : InkWell(
-                                                            onTap: () {
-                                                              Globals.timer
-                                                                  ?.cancel();
-                                                              Globals.checkTime(
-                                                                  context);
-                                                              Vibration.vibrate(
-                                                                  duration: 150,
-                                                                  amplitude: 1);
-                                                              FlutterBeep
-                                                                  .beep();
-                                                              cart.items
-                                                                  .forEach((key,
-                                                                      value) {});
-                                                            },
-                                                            child: const Icon(
-                                                                Icons.check,
-                                                                color: Colors
-                                                                    .green))),
-                                              ]),
-                                        ),
+                                                                    1]
+                                                                .name,
+                                                            double.parse(cart
+                                                                .items.values
+                                                                .toList()[cart
+                                                                        .items
+                                                                        .length -
+                                                                    i -
+                                                                    1]
+                                                                .rate
+                                                                .toString()),
+                                                            cart.items.values
+                                                                .toList()[cart
+                                                                        .items
+                                                                        .length -
+                                                                    i -
+                                                                    1]
+                                                                .storeId,
+                                                          );
+                                                        },
+                                                        child: const Icon(
+                                                          Icons
+                                                              .add_circle_outline,
+                                                          color: Colors.green,
+                                                        ),
+                                                      ),
+                                                      const SizedBox(width: 1)
+                                                    ]),
+                                              ),
+                                              SizedBox(
+                                                width: 60,
+                                                child: Text(
+                                                  cart.items.values
+                                                      .toList()[
+                                                          cart.items.length -
+                                                              i -
+                                                              1]
+                                                      .rate
+                                                      .toString(),
+                                                  style: const TextStyle(
+                                                      color: Colors.white),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 70,
+                                                child: Center(
+                                                  child: Text(
+                                                    "${cart.items.values.toList()[cart.items.length - i - 1].rate! * cart.items.values.toList()[cart.items.length - i - 1].quantity!}",
+                                                    style: const TextStyle(
+                                                        color: Colors.white),
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                  width: 20,
+                                                  child: cart.items.values
+                                                              .toList()[cart
+                                                                      .items
+                                                                      .length -
+                                                                  i -
+                                                                  1]
+                                                              .oldQuantity ==
+                                                          0
+                                                      ? InkWell(
+                                                          onTap: () {
+                                                            Globals.timer
+                                                                ?.cancel();
+                                                            Globals.checkTime(
+                                                                context);
+                                                           
+                                                            FlutterBeep
+                                                                .beep();
+                                                            cart.removeItem(
+                                                              cart.items.keys
+                                                                  .toList()[cart
+                                                                      .items
+                                                                      .length -
+                                                                  i -
+                                                                  1],
+                                                            );
+                                                          },
+                                                          child: const Icon(
+                                                              Icons.delete,
+                                                              color:
+                                                                  Colors.red))
+                                                      : InkWell(
+                                                          onTap: () {
+                                                            Globals.timer
+                                                                ?.cancel();
+                                                            Globals.checkTime(
+                                                                context);
+                                                          
+                                                            FlutterBeep
+                                                                .beep();
+                                                            cart.items
+                                                                .forEach((key,
+                                                                    value) {});
+                                                          },
+                                                          child: const Icon(
+                                                              Icons.check,
+                                                              color: Colors
+                                                                  .green))),
+                                            ]),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            decoration: BoxDecoration(color: Colors.grey[200]),
-                            child: Padding(
-                              padding: const EdgeInsets.all(4.0),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Column(children: [
-                                    const Text(
-                                      'Total Quantity',
-                                      style: TextStyle(
-                                          color: Colors.blueGrey,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      cart.totalItemsCount.toString(),
-                                      style: const TextStyle(
-                                          color: Colors.blueGrey,
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  ]),
-                                  Column(children: [
-                                    const Text(
-                                      'Gross Amount',
-                                      style: TextStyle(
-                                          color: Colors.blueGrey,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      "Rs.${cart.totalAmount}",
-                                      style: const TextStyle(
-                                          color: Colors.blueGrey,
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  ]),
-                                  Column(children: [
-                                    const Text('Discount Amount',
-                                        style: TextStyle(
-                                            color: Colors.blueGrey,
-                                            fontWeight: FontWeight.bold)),
-                                    Text(
-                                      "Rs.${discount.toString()}",
-                                      style: const TextStyle(
-                                          color: Colors.blueGrey,
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  ]),
-                                  Column(children: [
-                                    const Text(
-                                      'No. of Guest',
-                                      style: TextStyle(
-                                          color: Colors.blueGrey,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Container(
-                                        decoration: BoxDecoration(
-                                            borderRadius:
-                                                BorderRadius.circular(5),
-                                            color: Colors.white),
-                                        width: 70,
-                                        height: 24,
-                                        child: TextFormField(
-                                          style: const TextStyle(
-                                              color: Colors.blueGrey,
-                                              fontWeight: FontWeight.bold),
-                                          controller: guestController,
-                                          keyboardType: TextInputType.number,
-                                          decoration: const InputDecoration(
-                                              border: InputBorder.none),
-                                        ))
-                                  ]),
-                                  Column(children: [
-                                    const Text(
-                                      'Net Amount',
-                                      style: TextStyle(
-                                          color: Colors.blueGrey,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                    Text(
-                                      "Rs." +
-                                          (cart.totalAmount - (discount))
-                                              .toString(),
-                                      style: const TextStyle(
-                                          color: Colors.blueGrey,
-                                          fontWeight: FontWeight.bold),
-                                    )
-                                  ]),
-                                ],
                               ),
                             ),
-                          ),
-                          Container(
-                            color: Colors.grey[200],
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(6.0),
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          primary: Colors.redAccent,
-                                        ),
-                                        onPressed: () {
-                                          Globals.timer?.cancel();
-                                          Globals.checkTime(context);
-                                          cart.clear();
-                                          Navigator.push(context,
-                                              MaterialPageRoute(
-                                                  builder: (context) {
-                                            return const HomeScreen();
-                                          }));
-                                        },
-                                        child: const Text(
-                                          'Back to POS',
-                                          style: TextStyle(color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 200),
-                                  Expanded(
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(6.0),
-                                      child: ElevatedButton(
-                                        style: ElevatedButton.styleFrom(
-                                          primary: Colors.teal,
-                                        ),
-                                        onPressed: _isButtonDisabled == 0
-                                            ? () {
-                                                Globals.timer?.cancel();
-                                                Globals.checkTime(context);
-                                                Vibration.vibrate(
-                                                    duration: 150,
-                                                    amplitude: 1);
-
-                                                var cartItems = [];
-                                                cart.items
-                                                    .forEach((key, value) => {
-                                                          cartItems.add({
-                                                            'product_id': key,
-                                                            'quantity':
-                                                                value.quantity,
-                                                            'rate': value.rate,
-                                                            'amount': value
-                                                                    .quantity! *
-                                                                value.rate!,
-                                                            'product_store_id':
-                                                                value.storeId,
-                                                            'plus_quantity': value
-                                                                .plusQuantity,
-                                                            'is_new':
-                                                                value.isNew ??
-                                                                    0,
-                                                            'order_id':
-                                                                oldOrder['id']
-                                                          })
-                                                        });
-
-                                                if (oldOrder['table_id'] ==
-                                                        null ||
-                                                    widget.data == null) {
-                                                  toast(
-                                                      'Table or user not selected',
-                                                      Colors.green);
-                                                } else {
-                                                  bool found = cartItems.any(
-                                                      (element) =>
-                                                          element['is_new'] ==
-                                                          1);
-                                                  if (found == true) {
-                                                    var body = jsonEncode(<
-                                                        String, dynamic>{
-                                                      'order_items': cartItems,
-                                                      'gross_amount': cart
-                                                          .totalAmount
-                                                          .toString(),
-                                                      'net_amount':
-                                                          (cart.totalAmount -
-                                                                  discount)
-                                                              .toString(),
-                                                      'user_id':
-                                                          widget.data['id'],
-                                                      'store_id': widget
-                                                          .data['store_id'],
-                                                      'no_of_guest':
-                                                          guestController.text,
-                                                      'remark':
-                                                          remarksController
-                                                              .text,
-                                                      'table_id':
-                                                          oldOrder['table_id'],
-                                                    });
-                                                    //print(body);
-                                                    checkout(
-                                                        body: body, cart: cart);
-                                                  } else {
-                                                    toast("No item added",
-                                                        Colors.yellowAccent);
-                                                  }
-                                                }
-                                              }
-                                            : () {
-                                                Globals.timer?.cancel();
-                                                Globals.checkTime(context);
-                                              },
-                                        child: Text(
-                                          _isButtonDisabled == 1
-                                              ? "Hold on..."
-                                              : "Update Now",
-                                          style: const TextStyle(
-                                              color: Colors.white),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ]),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: Card(
-                    elevation: 5,
-                    child: Container(
-                      decoration: const BoxDecoration(
-                          border: Border(
-                              top:
-                                  BorderSide(color: Colors.blueGrey, width: 5)),
-                          color: Colors.white),
-                      child: ListView(
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 6.0),
-                            child: Padding(
-                              padding: const EdgeInsets.all(3.0),
+                            
+                             Container(
+                                decoration: BoxDecoration(color: Colors.grey[200]),
+                                padding: const EdgeInsets.symmetric(vertical: 5.0),
+                                child: Column(
+                                  children: [
+  Padding(
+    padding: const EdgeInsets.all(4.0),
+    child: Row(
+      mainAxisAlignment:
+          MainAxisAlignment.spaceEvenly,
+      children: [
+        Column(children: [
+          const Text(
+            'Total Quantity',
+            style: TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold),
+          ),
+          Text(
+            cart.totalItemsCount.toString(),
+            style: const TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold),
+          )
+        ]),
+        Column(children: [
+          const Text(
+            'Gross Amount',
+            style: TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold),
+          ),
+          Text(
+            "Rs.${cart.totalAmount}",
+            style: const TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold),
+          )
+        ]),
+        Column(children: [
+          const Text('Discount Amount',
+              style: TextStyle(
+                  color: Colors.blueGrey,
+                  fontWeight: FontWeight.bold)),
+          Text(
+            "Rs.${discount.toString()}",
+            style: const TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold),
+          )
+        ]),
+        Column(children: [
+          const Text(
+            'No. of Guest',
+            style: TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold),
+          ),
+          Container(
+              decoration: BoxDecoration(
+                  borderRadius:
+                      BorderRadius.circular(5),
+                  color: Colors.white),
+              width: 70,
+              height: 24,
+              child: TextFormField(
+                style: const TextStyle(
+                    color: Colors.blueGrey,
+                    fontWeight: FontWeight.bold),
+                controller: guestController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                    border: InputBorder.none),
+              ))
+        ]),
+        Column(children: [
+          const Text(
+            'Net Amount',
+            style: TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold),
+          ),
+          Text(
+            "Rs." +
+                (cart.totalAmount - (discount))
+                    .toString(),
+            style: const TextStyle(
+                color: Colors.blueGrey,
+                fontWeight: FontWeight.bold),
+          )
+        ]),
+      ],
+    ),
+  ),
+                            Container(
+                              color: Colors.grey[200],
                               child: Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    // Expanded(
-                                    //   flex: 2,
-                                    //   child: Container(
-
-                                    //     decoration: BoxDecoration(
-                                    //         color: Colors.white,
-                                    //         border: Border.all(
-                                    //             color: Colors.grey[400]),
-                                    //         borderRadius:
-                                    //             BorderRadius.circular(5)),
-                                    //     height: 35,
-                                    //     // width:
-                                    //     //     MediaQuery.of(context).size.width * 0.2,
-                                    //     child: Padding(
-                                    //       padding: const EdgeInsets.all(4.0),
-                                    //       child: getCategories(categories),
-                                    //     ),
-                                    //   ),
-                                    // ),
                                     Expanded(
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.white,
-                                            border: Border.all(
-                                                color: Colors.grey[400]!),
-                                            borderRadius:
-                                                BorderRadius.circular(2)),
-                                        height: 35,
-                                        // width:
-                                        //     MediaQuery.of(context).size.width * 0.15,
-
-                                        child: TextField(
-                                          controller: filterController,
-                                          onChanged: onSearchTextChanged,
-                                          //  autocorrect: true,
-                                          decoration: const InputDecoration(
-                                              isDense: true,
-                                              contentPadding:
-                                                  EdgeInsets.all(6.5),
-                                              hintText: 'Search Item',
-                                              border: InputBorder.none),
-                                        ),
-                                      ),
-                                    ),
-
-                                    const SizedBox(
-                                      width: 3.0,
-                                    ),
-                                    InkWell(
-                                      onTap: () {
-                                        Globals.timer?.cancel();
-                                        Globals.checkTime(context);
-                                        filterController.clear();
-                                        onSearchTextChanged('');
-                                      },
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                            color: Colors.teal,
-                                            borderRadius:
-                                                BorderRadius.circular(4)),
-                                        child: const Padding(
-                                          padding: EdgeInsets.all(8.0),
-                                          child: Text(
-                                            'All',
-                                            style:
-                                                TextStyle(color: Colors.white),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(6.0),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Colors.redAccent,
+                                          ),
+                                          onPressed: () {
+                                            Globals.timer?.cancel();
+                                            Globals.checkTime(context);
+                                            cart.clear();
+                                            Navigator.push(context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                              return  HomeScreen(selectedTable: null,);
+                                            }));
+                                          },
+                                          child: const Text(
+                                            'Back to POS',
+                                            style: TextStyle(color: Colors.white),
                                           ),
                                         ),
                                       ),
-                                    )
+                                    ),
+                                    const SizedBox(width: 200),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(6.0),
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            primary: Colors.teal,
+                                          ),
+                                          onPressed: _isButtonDisabled == 0
+                                              ? () {
+                                                  Globals.timer?.cancel();
+                                                  Globals.checkTime(context);
+                                                   FlutterBeep.beep();
+        
+                                                  var cartItems = [];
+                                                  cart.items
+                                                      .forEach((key, value) => {
+                                                            cartItems.add({
+                                                              'product_id': key,
+                                                              'quantity':
+                                                                  value.quantity,
+                                                              'rate': value.rate,
+                                                              'amount': value
+                                                                      .quantity! *
+                                                                  value.rate!,
+                                                              'product_store_id':
+                                                                  value.storeId,
+                                                              'plus_quantity': value
+                                                                  .plusQuantity,
+                                                              'is_new':
+                                                                  value.isNew ??
+                                                                      0,
+                                                              'order_id':
+                                                                  oldOrder['id']
+                                                            })
+                                                          });
+        
+                                                  if (oldOrder['table_id'] ==
+                                                          null ||
+                                                      widget.data == null) {
+                                                    toast(
+                                                        'Table or user not selected',
+                                                        Colors.green);
+                                                  } else {
+                                                    bool found = cartItems.any(
+                                                        (element) =>
+                                                            element['is_new'] ==
+                                                            1);
+                                                    if (found == true) {
+                                                      var body = jsonEncode(<
+                                                          String, dynamic>{
+                                                        'order_items': cartItems,
+                                                        'gross_amount': cart
+                                                            .totalAmount
+                                                            .toString(),
+                                                        'net_amount':
+                                                            (cart.totalAmount -
+                                                                    discount)
+                                                                .toString(),
+                                                        'user_id':
+                                                            widget.data['id'],
+                                                        'store_id': widget
+                                                            .data['store_id'],
+                                                        'no_of_guest':
+                                                            guestController.text,
+                                                        'remark':
+                                                            remarksController
+                                                                .text,
+                                                        'table_id':
+                                                            oldOrder['table_id'],
+                                                      });
+                                                      //print(body);
+                                                      checkout(
+                                                          body: body, cart: cart);
+                                                    } else {
+                                                      toast("No item added",
+                                                          Colors.yellowAccent);
+                                                    }
+                                                  }
+                                                }
+                                              : () {
+                                                  Globals.timer?.cancel();
+                                                  Globals.checkTime(context);
+                                                },
+                                          child: Text(
+                                            _isButtonDisabled == 1
+                                                ? "Hold on..."
+                                                : "Update Now",
+                                            style: const TextStyle(
+                                                color: Colors.white),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ]),
                             ),
-                          ),
-                          const SizedBox(
-                            height: 10,
-                          ),
-                          SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.75,
-                              width: MediaQuery.of(context).size.height * 0.65,
+                          
+                          
+                                  ],
+                                ),
+                             ),
+                            
+                          
+                          
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 4,
+                    child: Card(
+                      elevation: 5,
+                      child: Container(
+                        decoration: const BoxDecoration(
+                            border: Border(
+                                top:
+                                    BorderSide(color: Colors.blueGrey, width: 5)),
+                            color: Colors.white),
+                        child: Column(
+                          children: [
+                            Container(
+                              margin: const EdgeInsets.only(top: 6.0),
+                              child: Padding(
+                                padding: const EdgeInsets.all(3.0),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      // Expanded(
+                                      //   flex: 2,
+                                      //   child: Container(
+        
+                                      //     decoration: BoxDecoration(
+                                      //         color: Colors.white,
+                                      //         border: Border.all(
+                                      //             color: Colors.grey[400]),
+                                      //         borderRadius:
+                                      //             BorderRadius.circular(5)),
+                                      //     height: 35,
+                                      //     // width:
+                                      //     //     MediaQuery.of(context).size.width * 0.2,
+                                      //     child: Padding(
+                                      //       padding: const EdgeInsets.all(4.0),
+                                      //       child: getCategories(categories),
+                                      //     ),
+                                      //   ),
+                                      // ),
+                                      Expanded(
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              border: Border.all(
+                                                  color: Colors.grey[400]!),
+                                              borderRadius:
+                                                  BorderRadius.circular(2)),
+                                          height: 35,
+                                          // width:
+                                          //     MediaQuery.of(context).size.width * 0.15,
+        
+                                          child: TextField(
+                                            controller: filterController,
+                                            onChanged: onSearchTextChanged,
+                                            //  autocorrect: true,
+                                            decoration: const InputDecoration(
+                                                isDense: true,
+                                                contentPadding:
+                                                    EdgeInsets.all(6.5),
+                                                hintText: 'Search Item',
+                                                border: InputBorder.none),
+                                          ),
+                                        ),
+                                      ),
+        
+                                      const SizedBox(
+                                        width: 3.0,
+                                      ),
+                                      InkWell(
+                                        onTap: () {
+                                          Globals.timer?.cancel();
+                                          Globals.checkTime(context);
+                                          filterController.clear();
+                                          onSearchTextChanged('');
+                                        },
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.teal,
+                                              borderRadius:
+                                                  BorderRadius.circular(4)),
+                                          child: const Padding(
+                                            padding: EdgeInsets.all(8.0),
+                                            child: Text(
+                                              'All',
+                                              style:
+                                                  TextStyle(color: Colors.white),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    ]),
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 10,
+                            ),
+                            Expanded(
                               child: GridView.count(
+                                shrinkWrap: true,
                                   crossAxisCount: 4,
                                   padding: const EdgeInsets.all(4.0),
                                   children: _searchResult.map((product) {
@@ -1016,17 +1005,19 @@ class _EditPosScreenState extends State<EditPosScreen> {
                                         ),
                                       ),
                                     );
-                                  }).toList()))
-                        ],
+                                  }).toList()),
+                            )
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          )),
+                ],
+              ),
+            )),
+          ),
         ),
-      );
+      ));
     });
   }
 }

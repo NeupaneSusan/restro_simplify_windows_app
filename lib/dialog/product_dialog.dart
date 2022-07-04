@@ -9,7 +9,7 @@ import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/models/Product.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
-import 'package:vibration/vibration.dart';
+
 
 class ProductDialog extends StatefulWidget {
   final String categoryId;
@@ -183,7 +183,7 @@ class _ProductDialogState extends State<ProductDialog> {
                                 onTap: () {
                                   Globals.timer?.cancel();
                                   Globals.checkTime(context);
-                                  Vibration.vibrate(duration: 150, amplitude: 1);
+                               
                                   FlutterBeep.beep();
                                   final cart = Provider.of<CartController>(
                                       context,

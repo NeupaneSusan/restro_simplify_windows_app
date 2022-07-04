@@ -1,31 +1,42 @@
-import 'dart:async';
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:flutter/services.dart';
 import 'package:restro_simplify/controller/TimeController.dart';
+import 'package:restro_simplify/controller/sliderlistController.dart';
+import 'package:restro_simplify/models/slider.dart';
 import 'package:restro_simplify/screens/loginscreen.dart';
 import 'controller/CartController.dart';
 
 void main() {
-  runApp(ChangeNotifierProvider(
-      create: (context) => CartController(), child: MyWidget()));
+  runApp( MyWidget());
 }
 
 class MyWidget extends StatelessWidget {
-  MyWidget({Key? key}) : super(key: key);
+ const  MyWidget({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    return MaterialApp(
-      navigatorKey: Globals.navigatorKey,
-      title: "RestroMS",
-      debugShowCheckedModeBanner: false,
-      home: const ContainerPage(),
+    return MultiProvider(
+  providers: [
+    ChangeNotifierProvider(
+      create: (context) => CartController()),
+    ChangeNotifierProvider(create: (context)=>SliderListController())
+  ],
+      child: MaterialApp(
+        navigatorKey: Globals.navigatorKey,
+        title: "RestroMS",
+        debugShowCheckedModeBanner: false,
+        home: const ContainerPage(),
+      ),
     );
   }
 }
@@ -45,8 +56,25 @@ class _ContainerPageState extends State<ContainerPage> {
     Globals.checkTime(context);
     getImageForSlider();
   }
-    getImageForSlider(){
-      
+  readImage(image) async {
+    final ByteData imageData = await NetworkAssetBundle(Uri.parse(image)).load("");
+    Uint8List bytes = imageData.buffer.asUint8List();
+    return bytes;
+  }
+   void getImageForSlider() async{
+    final sliderProvider = Provider.of<SliderListController>(context,listen: false);
+    List<SliderModel> sliderlist=[];
+       var res = await http
+          .get(Uri.parse('http://192.168.1.1/restroms/api/medias/sliders'));
+      if (res.statusCode == 200) {
+        final data =   jsonDecode(res.body)['data'];
+        for(var result in data){
+          var image =  await readImage(result['image']);
+          result['image'] = image;
+            sliderlist.add(SliderModel.fromJson(result));
+        }
+        sliderProvider.setSliderList(sliderlist);
+      }
     }
   @override
   Widget build(BuildContext context) {
@@ -75,9 +103,3 @@ class _ContainerPageState extends State<ContainerPage> {
 }
 
 
-//  void Function(PointerDownEvent)? onPointerDown,
-//   void Function(PointerMoveEvent)? onPointerMove,
-//   void Function(PointerUpEvent)? onPointerUp,
-//   void Function(PointerHoverEvent)? onPointerHover,
-//   void Function(PointerCancelEvent)? onPointerCancel,
-//   void Function(PointerSignalEvent)? onPointerSignal,
