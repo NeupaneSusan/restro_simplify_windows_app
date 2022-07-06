@@ -1,15 +1,13 @@
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_beep/flutter_beep.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:restro_simplify/controller/TimeController.dart';
+import 'package:restro_simplify/controller/audio_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 
 import 'editpos.dart';
 import 'package:flutter/services.dart';
@@ -35,8 +33,8 @@ class _OrderScreenState extends State<OrderScreen> {
 
     final response =
         await http.get(Uri.parse(url + "/tableOrders/getUnpaidOrders/$id"));
-        print(response.statusCode);
-        print(response.body);
+    print(response.statusCode);
+
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body);
 
@@ -63,11 +61,10 @@ class _OrderScreenState extends State<OrderScreen> {
         .get(Uri.parse(url + "/tableOrders/requestBill/$id/$orderId"));
 
     if (response.statusCode == 200) {
-     showToast(
-           "Bill Successfully Requested",
-            context: context,
-                                  position: StyledToastPosition.center,  
-                                    duration: const Duration(seconds: 2),
+      showToast("Bill Successfully Requested",
+          context: context,
+          position: StyledToastPosition.center,
+          duration: const Duration(seconds: 2),
           backgroundColor: Colors.green);
       getOrderData();
       return "success";
@@ -124,8 +121,11 @@ class _OrderScreenState extends State<OrderScreen> {
                     children: orders!.map((data) {
                       return InkWell(
                         onLongPress: () {
-                         
-                           FlutterBeep.beep();
+                          Globals.timer?.cancel();
+                          Globals.checkTime(context);
+                          final myAudio = MyAudio();
+                          myAudio.playSound();
+
                           _neverSatisfied(data['id'], data['user_id'])
                               .then((value) {});
                         },
@@ -150,21 +150,21 @@ class _OrderScreenState extends State<OrderScreen> {
                                     .push(MaterialPageRoute(builder: (context) {
                                   return EditPosScreen(
                                       orderId: data['id'], data: widget.data);
-                                }));
+                                })).then((value) {
+                                  getOrderData();
+                                });
                               } else if (res.statusCode == 406) {
                                 var message = json.decode(res.body)['message'];
-                               showToast(
-                                   message,
+                                showToast(message,
                                     context: context,
-                                  position: StyledToastPosition.center,  
+                                    position: StyledToastPosition.center,
                                     duration: const Duration(seconds: 2),
                                     backgroundColor: Colors.green);
                               } else if (res.statusCode == 401) {
                                 var message = json.decode(res.body)['message'];
-                               showToast(
-                                    message,
-                                     context: context,
-                                  position: StyledToastPosition.center,  
+                                showToast(message,
+                                    context: context,
+                                    position: StyledToastPosition.center,
                                     duration: const Duration(seconds: 2),
                                     backgroundColor: Colors.orange);
                               }

@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:restro_simplify/controller/CartController.dart';
 import 'package:restro_simplify/controller/TimeController.dart';
+import 'package:restro_simplify/controller/audio_controller.dart';
 import 'package:restro_simplify/models/floor.dart';
 import 'package:restro_simplify/screens/loginscreen.dart';
 import 'package:restro_simplify/screens/paidorders.dart';
@@ -244,6 +245,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                                 onTap: () {
                                                   Globals.timer?.cancel();
                                                   Globals.checkTime(context);
+                                                   final myAudio = MyAudio();
+              myAudio.playSound();
+            
                                                   if (floorId != floor[i].id) {
                                                     changeFloor(floor[i].id);
                                                     setState(() {

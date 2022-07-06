@@ -2,10 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_beep/flutter_beep.dart';
+
 import 'package:provider/provider.dart';
 import 'package:restro_simplify/controller/CartController.dart';
 import 'package:restro_simplify/controller/TimeController.dart';
+import 'package:restro_simplify/controller/audio_controller.dart';
 import 'package:restro_simplify/models/Product.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -184,7 +185,9 @@ class _ProductDialogState extends State<ProductDialog> {
                                   Globals.timer?.cancel();
                                   Globals.checkTime(context);
                                
-                                  FlutterBeep.beep();
+                                  final myAudio = MyAudio();
+              myAudio.playSound();
+            
                                   final cart = Provider.of<CartController>(
                                       context,
                                       listen: false);

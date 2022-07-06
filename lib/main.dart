@@ -10,15 +10,16 @@ import 'package:flutter/services.dart';
 import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/controller/sliderlistController.dart';
 import 'package:restro_simplify/models/slider.dart';
+import 'package:restro_simplify/screens/checkLogin.dart';
 import 'package:restro_simplify/screens/loginscreen.dart';
 import 'controller/CartController.dart';
 
 void main() {
-  runApp( MyWidget());
+  runApp(MyWidget());
 }
 
 class MyWidget extends StatelessWidget {
- const  MyWidget({Key? key}) : super(key: key);
+  const MyWidget({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
@@ -26,11 +27,10 @@ class MyWidget extends StatelessWidget {
       DeviceOrientation.landscapeRight,
     ]);
     return MultiProvider(
-  providers: [
-    ChangeNotifierProvider(
-      create: (context) => CartController()),
-    ChangeNotifierProvider(create: (context)=>SliderListController())
-  ],
+      providers: [
+        ChangeNotifierProvider(create: (context) => CartController()),
+        ChangeNotifierProvider(create: (context) => SliderListController())
+      ],
       child: MaterialApp(
         navigatorKey: Globals.navigatorKey,
         title: "RestroMS",
@@ -56,26 +56,31 @@ class _ContainerPageState extends State<ContainerPage> {
     Globals.checkTime(context);
     getImageForSlider();
   }
+
   readImage(image) async {
-    final ByteData imageData = await NetworkAssetBundle(Uri.parse(image)).load("");
+    final ByteData imageData =
+        await NetworkAssetBundle(Uri.parse(image)).load("");
     Uint8List bytes = imageData.buffer.asUint8List();
     return bytes;
   }
-   void getImageForSlider() async{
-    final sliderProvider = Provider.of<SliderListController>(context,listen: false);
-    List<SliderModel> sliderlist=[];
-       var res = await http
-          .get(Uri.parse('http://192.168.1.1/restroms/api/medias/sliders'));
-      if (res.statusCode == 200) {
-        final data =   jsonDecode(res.body)['data'];
-        for(var result in data){
-          var image =  await readImage(result['image']);
-          result['image'] = image;
-            sliderlist.add(SliderModel.fromJson(result));
-        }
-        sliderProvider.setSliderList(sliderlist);
+
+  void getImageForSlider() async {
+    final sliderProvider =
+        Provider.of<SliderListController>(context, listen: false);
+    List<SliderModel> sliderlist = [];
+    var res = await http
+        .get(Uri.parse('http://192.168.1.1/restroms/api/medias/sliders'));
+    if (res.statusCode == 200) {
+      final data = jsonDecode(res.body)['data'];
+      for (var result in data) {
+        var image = await readImage(result['image']);
+        result['image'] = image;
+        sliderlist.add(SliderModel.fromJson(result));
       }
+      sliderProvider.setSliderList(sliderlist);
     }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -97,9 +102,7 @@ class _ContainerPageState extends State<ContainerPage> {
             Globals.timer?.cancel();
             Globals.checkTime(context);
           },
-          child: const LoginScreen()),
+          child: const CheckLogin()),
     );
   }
 }
-
-

@@ -7,13 +7,12 @@ import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:restro_simplify/controller/TimeController.dart';
-import 'package:restro_simplify/screens/firstScreen.dart';
+import 'package:restro_simplify/screens/checkLogin.dart';
 
 import '../models/login.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -29,9 +28,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController email = TextEditingController();
   String versionName = '';
-  bool isbool = true;
+  bool isOnline = true;
   bool isLoading = false;
-  bool response = false;
 
   final url = "http://192.168.1.1/restroms/api";
   final checkurl =
@@ -39,52 +37,8 @@ class _LoginScreenState extends State<LoginScreen> {
   var urls;
   var userData;
   var data = Login();
-  checkLogin() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    bool data = prefs.getBool('isLogin') ?? false;
-    try {
-      final res = await http.get(checkurl);
-
-      if (res.statusCode == 200) {
-        if (mounted) {
-          setState(() {
-            response = true;
-          });
-        }
-      }
-    } on SocketException {
-      setState(() {
-        response = false;
-      });
-      showToast(
-          "SocketExcepton",
-            context: context,
-                                  position: StyledToastPosition.center,  
-                                    duration: const Duration(seconds: 2),
-          backgroundColor: Colors.red);
-    }
-    if (data == true && response == true) {
-      Navigator.of(context)
-          .pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
-        return const MyFirstScreen();
-      }));
-    }
-  }
 
   TextEditingController password = TextEditingController();
-
-  internetChecker() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile ||
-        connectivityResult == ConnectivityResult.wifi) {
-      const LoginScreen();
-    } else {
-      _showDialog(
-          "No Internet Connection", "Check your internet and try again?");
-    }
-  }
-
-// save userdata to localstorage
   addUserToLocalStorage(data) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('isLogin', true);
@@ -113,19 +67,18 @@ class _LoginScreenState extends State<LoginScreen> {
           addUserToLocalStorage(userData);
           prefs.setString('userid', userData['id']);
           isLoading = false;
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (BuildContext context) {
+            return const CheckLogin();
+          }));
         });
 
-        Navigator.of(context)
-            .pushReplacement(MaterialPageRoute(builder: (BuildContext context) {
-          return const MyFirstScreen();
-        }));
         return true;
       } else {
-    showToast(
-             "Credentials doesnot matched!",
+        showToast("Credentials doesnot matched!",
             context: context,
-                                  position: StyledToastPosition.center,  
-                                    duration: const Duration(seconds: 2),
+            position: StyledToastPosition.center,
+            duration: const Duration(seconds: 2),
             backgroundColor: Colors.red);
         setState(() {
           isLoading = false;
@@ -133,29 +86,46 @@ class _LoginScreenState extends State<LoginScreen> {
         return false;
       }
     } on SocketException {
-showToast(
-          "System is Offline",
-         
+      showToast("System is Offline",
+          context: context,
+          position: StyledToastPosition.center,
+          duration: const Duration(seconds: 2),
           backgroundColor: Colors.red);
       setState(() {
         isLoading = false;
+        isOnline = false;
       });
       return false;
     }
   }
 
   getVersion() async {
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-    setState(() {
-      versionName = packageInfo.version;
-    });
+    try {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      final response = await http.get(checkurl);
+      if (response.statusCode == 200) {
+        setState(() {
+          isOnline = true;
+          versionName = packageInfo.version;
+        });
+      } else {
+        setState(() {
+          isOnline = false;
+          versionName = packageInfo.version;
+        });
+      }
+    } catch (error) {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      setState(() {
+        isOnline = false;
+        versionName = packageInfo.version;
+      });
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    internetChecker();
-    checkLogin();
     getVersion();
   }
 
@@ -222,7 +192,7 @@ showToast(
                                   width: 20.0,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(50),
-                                    color: response == true
+                                    color: isOnline == true
                                         ? Colors.green
                                         : Colors.red,
                                   ),
@@ -230,7 +200,7 @@ showToast(
                                 const SizedBox(
                                   height: 5.0,
                                 ),
-                                Text(response == true ? 'Online' : 'Offline',
+                                Text(isOnline == true ? 'Online' : 'Offline',
                                     style: const TextStyle(fontSize: 15)),
                               ],
                             ),
@@ -247,8 +217,8 @@ showToast(
                               width: 400,
                               child: TextFormField(
                                 onChanged: ((value) {
-                                    Globals.timer!.cancel();
-        Globals.checkTime(context);
+                                  Globals.timer!.cancel();
+                                  Globals.checkTime(context);
                                 }),
                                 controller: email,
                                 obscureText: false,
@@ -266,8 +236,8 @@ showToast(
                             width: 400,
                             child: TextFormField(
                               onChanged: (value) {
-                                  Globals.timer!.cancel();
-        Globals.checkTime(context);
+                                Globals.timer!.cancel();
+                                Globals.checkTime(context);
                               },
                               controller: password,
                               obscureText: true,
@@ -284,7 +254,7 @@ showToast(
                           const SizedBox(
                             height: 35.0,
                           ),
-                          response == true
+                          isOnline == true
                               ? Material(
                                   elevation: 5.0,
                                   borderRadius: BorderRadius.circular(30.0),
@@ -295,17 +265,18 @@ showToast(
                                       padding: const EdgeInsets.fromLTRB(
                                           20.0, 15.0, 20.0, 15.0),
                                       onPressed: () async {
-                                          Globals.timer!.cancel();
-        Globals.checkTime(context);
+                                        Globals.timer!.cancel();
+                                        Globals.checkTime(context);
                                         FocusScope.of(context)
                                             .requestFocus(FocusNode());
                                         if (email.text.isEmpty ||
                                             password.text.isEmpty) {
-                                          showToast(
-                                               "Credentials must required",
-                                             context: context,
-                                  position: StyledToastPosition.center,  
-                                    duration: const Duration(seconds: 2),
+                                          showToast("Credentials must required",
+                                              context: context,
+                                              position:
+                                                  StyledToastPosition.center,
+                                              duration:
+                                                  const Duration(seconds: 2),
                                               backgroundColor: Colors.red);
                                         } else {
                                           setState(() {
