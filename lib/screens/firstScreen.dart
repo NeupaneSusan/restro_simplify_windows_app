@@ -40,6 +40,7 @@ class _MyFirstScreenState extends State<MyFirstScreen> {
 
   Future<String> fetchTables() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    print("object");
     var floorId = prefs.getString('floorId');
     var res = await http.get(Uri.parse(url + '/tables/$floorId'));
     if (res.statusCode == 200) {
@@ -112,7 +113,9 @@ class _MyFirstScreenState extends State<MyFirstScreen> {
                                 selectedTable: table,
                                 data: userData,
                               );
-                            }));
+                            })).then((value) {
+                              fetchTables();
+                            });
                           },
                           child: Container(
                             decoration: const BoxDecoration(
@@ -188,9 +191,10 @@ class _MyFirstScreenState extends State<MyFirstScreen> {
                         Navigator.push(context, MaterialPageRoute(builder: (_) {
                           return PosPage(
                             data: userData,
-                            selectedTable: null,
                           );
-                        }));
+                        })).then((value) {
+                          fetchTables();
+                        });
                       },
                       icon: const Icon(
                         Icons.apps,
@@ -233,7 +237,9 @@ class _MyFirstScreenState extends State<MyFirstScreen> {
                           return OrderScreen(
                             data: userData!,
                           );
-                        }));
+                        })).then((value) {
+                          fetchTables();
+                        });
                       },
                       icon: const Icon(
                         Icons.table_chart,
@@ -277,7 +283,9 @@ class _MyFirstScreenState extends State<MyFirstScreen> {
                             data: userData,
                             bytes: imageByte!,
                           );
-                        }));
+                        })).then((value) {
+                          fetchTables();
+                        });
                       },
                       icon: const Icon(
                         Icons.person,

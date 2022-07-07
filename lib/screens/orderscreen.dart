@@ -33,7 +33,6 @@ class _OrderScreenState extends State<OrderScreen> {
 
     final response =
         await http.get(Uri.parse(url + "/tableOrders/getUnpaidOrders/$id"));
-    print(response.statusCode);
 
     if (response.statusCode == 200) {
       var jsonData = json.decode(response.body);
@@ -81,155 +80,187 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    double height = MediaQuery.of(context).size.height * .04;
+
     // Set landscape orientation
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    return Scaffold(
-        body: count == 0
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerCancel: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerDown: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerHover: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerMove: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      child: Scaffold(
+          body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+                onPressed: () {
+                  final myAudio = MyAudio();
+                  Globals.timer?.cancel();
+                  Globals.checkTime(context);
+                  Navigator.pop(context);
+                  myAudio.playSound();
+                },
+                icon: const Icon(Icons.arrow_back)),
+            count != 0
+                ? Text(
+                    "Current Running Tables : " + count.toString(),
+                    style: const TextStyle(
+                        color: Colors.blueGrey,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18),
+                  )
+                : SizedBox(),
+            SizedBox()
+          ],
+        ),
+        count == 0
             ? GestureDetector(
                 onTap: () {
                   Globals.timer?.cancel();
                   Globals.checkTime(context);
                 },
-                child: const Center(
-                  child: Center(
-                    child: Text("No Orders Yet!"),
-                  ),
+                child: Center(
+                  heightFactor: height,
+                  child: Text("No Orders Yet!"),
                 ),
               )
-            : ListView(
-                children: <Widget>[
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        "Current Running Tables : " + count.toString(),
-                        style: const TextStyle(
-                            color: Colors.blueGrey,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18),
-                      ),
-                    ),
-                  ),
-                  GridView.count(
-                    shrinkWrap: true,
-                    physics: const ScrollPhysics(),
-                    crossAxisCount: 7,
-                    children: orders!.map((data) {
-                      return InkWell(
-                        onLongPress: () {
-                          Globals.timer?.cancel();
-                          Globals.checkTime(context);
-                          final myAudio = MyAudio();
-                          myAudio.playSound();
+            : Expanded(
+                child: GridView.count(
+                  shrinkWrap: true,
+                  physics: const ScrollPhysics(),
+                  crossAxisCount: 8,
+                  children: orders!.map((data) {
+                    return InkWell(
+                      onLongPress: () {
+                        Globals.timer?.cancel();
+                        Globals.checkTime(context);
+                        final myAudio = MyAudio();
+                        myAudio.playSound();
 
-                          _neverSatisfied(data['id'], data['user_id'])
-                              .then((value) {});
-                        },
-                        child: Card(
-                          color: data['is_printed'] == '0'
-                              ? Colors.blueGrey
-                              : Colors.blueGrey[300],
-                          child: InkWell(
-                            onTap: () async {
-                              Globals.timer?.cancel();
-                              Globals.checkTime(context);
-                              // var res = await http.get
-                              // ('https://jsonplaceholder.typicode.com/photos');
-                              var res = await http.get(Uri.parse(url +
-                                  '/tableOrders/' +
-                                  widget.data['id'] +
-                                  '/' +
-                                  data['id']));
+                        _neverSatisfied(data['id'], data['user_id'])
+                            .then((value) {});
+                      },
+                      child: Card(
+                        color: data['is_printed'] == '0'
+                            ? Colors.blueGrey
+                            : Colors.blueGrey[300],
+                        child: InkWell(
+                          onTap: () async {
+                            Globals.timer?.cancel();
+                            Globals.checkTime(context);
+                            var res = await http.get(Uri.parse(url +
+                                '/tableOrders/' +
+                                widget.data['id'] +
+                                '/' +
+                                data['id']));
 
-                              if (res.statusCode == 200) {
-                                Navigator.of(context)
-                                    .push(MaterialPageRoute(builder: (context) {
-                                  return EditPosScreen(
-                                      orderId: data['id'], data: widget.data);
-                                })).then((value) {
-                                  getOrderData();
-                                });
-                              } else if (res.statusCode == 406) {
-                                var message = json.decode(res.body)['message'];
-                                showToast(message,
-                                    context: context,
-                                    position: StyledToastPosition.center,
-                                    duration: const Duration(seconds: 2),
-                                    backgroundColor: Colors.green);
-                              } else if (res.statusCode == 401) {
-                                var message = json.decode(res.body)['message'];
-                                showToast(message,
-                                    context: context,
-                                    position: StyledToastPosition.center,
-                                    duration: const Duration(seconds: 2),
-                                    backgroundColor: Colors.orange);
-                              }
-                            },
-                            child: Align(
-                              alignment: Alignment.center,
-                              child: Container(
-                                margin: const EdgeInsets.only(top: 5),
-                                child: Column(
-                                  children: <Widget>[
-                                    const Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: 35.0),
-                                      child: SizedBox(
-                                          width: 40.0,
-                                          child: Icon(
-                                            Icons.table_bar,
-                                            size: 35,
-                                            color: Colors.white,
-                                          )),
-                                    ),
-                                    Text(
-                                      data['table_name'],
+                            if (res.statusCode == 200) {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return EditPosScreen(
+                                  orderId: data['id'],
+                                  data: widget.data,
+                                  totalUpdate: data["total_updates"],
+                                );
+                              })).then((value) {
+                                getOrderData();
+                              });
+                            } else if (res.statusCode == 406) {
+                              var message = json.decode(res.body)['message'];
+                              showToast(message,
+                                  context: context,
+                                  position: StyledToastPosition.center,
+                                  duration: const Duration(seconds: 2),
+                                  backgroundColor: Colors.green);
+                            } else if (res.statusCode == 401) {
+                              var message = json.decode(res.body)['message'];
+                              showToast(message,
+                                  context: context,
+                                  position: StyledToastPosition.center,
+                                  duration: const Duration(seconds: 2),
+                                  backgroundColor: Colors.orange);
+                            }
+                          },
+                          child: Align(
+                            alignment: Alignment.center,
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 5),
+                              child: Column(
+                                children: <Widget>[
+                                  const Padding(
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 35.0),
+                                    child: SizedBox(
+                                        width: 40.0,
+                                        child: Icon(
+                                          Icons.table_bar,
+                                          size: 35,
+                                          color: Colors.white,
+                                        )),
+                                  ),
+                                  Text(
+                                    data['table_name'],
+                                    style: const TextStyle(
+                                        color: Colors.white, fontSize: 13),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 4.0),
+                                    child: Text(
+                                      data['order_created_time'],
                                       style: const TextStyle(
                                           color: Colors.white, fontSize: 13),
                                     ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 4.0),
-                                      child: Text(
-                                        data['order_created_time'],
-                                        style: const TextStyle(
-                                            color: Colors.white, fontSize: 13),
-                                      ),
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.only(top: 5),
-                                      child: Align(
-                                        alignment: Alignment.bottomCenter,
-                                        child: Card(
-                                          color: Colors.blueGrey[200],
-                                          elevation: 0,
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Rs.${data['net_amount']}",
-                                              style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12),
-                                            ),
+                                  ),
+                                  Container(
+                                    margin: const EdgeInsets.only(top: 5),
+                                    child: Align(
+                                      alignment: Alignment.bottomCenter,
+                                      child: Card(
+                                        color: Colors.blueGrey[200],
+                                        elevation: 0,
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Text(
+                                            "Rs.${data['net_amount']}",
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 12),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ],
-                                ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
                         ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ));
+                      ),
+                    );
+                  }).toList(),
+                ),
+              )
+      ])),
+    );
   }
 
   Future<void> _neverSatisfied(orderId, userId) async {

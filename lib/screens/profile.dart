@@ -122,304 +122,340 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: SafeArea(
-            child: Container(
-      margin: const EdgeInsets.only(top: 40),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(left: 15.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  ElevatedButton.icon(
-                      style: TextButton.styleFrom(
-                          backgroundColor: Colors.blueGrey,
-                          primary: Colors.white),
-                      onPressed: () {
-                        Globals.timer?.cancel();
-                        Globals.checkTime(context);
-                        showDialog(
-                            context: context,
-                            builder: (context) =>
-                                _onTapImage(context)); // Call the Dialog.
-                      },
-                      icon: const Icon(
-                        Icons.qr_code,
-                        size: 30.0,
-                      ),
-                      label: const Text(
-                        'Scan For Payment',
-                        style: TextStyle(fontSize: 20),
-                      )),
-                  const SizedBox(
-                    height: 20,
-                  ),
-                  ElevatedButton.icon(
-                      style: TextButton.styleFrom(
-                          backgroundColor: Colors.blueGrey),
-                      onPressed: () {
-                        Globals.timer?.cancel();
-                        Globals.checkTime(context);
-                        showDialog(
-                            context: context,
-                            builder: (context) {
-                              return PaidOrders(data: widget.data);
-                            }); // Call the Dialog.
-                      },
-                      icon: const Icon(
-                        Icons.attach_money,
-                        size: 30,
-                      ),
-                      label: const Text(
-                        'Settled Bill',
-                        style: TextStyle(fontSize: 20),
-                      )),
-                ],
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerCancel: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerDown: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerHover: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerMove: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      child: Scaffold(
+          body: SafeArea(
+              child: Container(
+        margin: const EdgeInsets.only(top: 5),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 15.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconButton(
+                        onPressed: () {
+                          final myAudio = MyAudio();
+                          Globals.timer?.cancel();
+                          Globals.checkTime(context);
+                          myAudio.playSound();
+                          Navigator.of(context).pop(true);
+                        },
+                        icon: const Icon(Icons.arrow_back)),
+                    SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton.icon(
+                        style: TextButton.styleFrom(
+                            backgroundColor: Colors.blueGrey,
+                            primary: Colors.white),
+                        onPressed: () {
+                          Globals.timer?.cancel();
+                          Globals.checkTime(context);
+                          showDialog(
+                              context: context,
+                              builder: (context) =>
+                                  _onTapImage(context)); // Call the Dialog.
+                        },
+                        icon: const Icon(
+                          Icons.qr_code,
+                          size: 30.0,
+                        ),
+                        label: const Text(
+                          'Scan For Payment',
+                          style: TextStyle(fontSize: 20),
+                        )),
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    ElevatedButton.icon(
+                        style: TextButton.styleFrom(
+                            backgroundColor: Colors.blueGrey),
+                        onPressed: () {
+                          Globals.timer?.cancel();
+                          Globals.checkTime(context);
+                          showDialog(
+                              context: context,
+                              builder: (context) {
+                                return PaidOrders(data: widget.data);
+                              }); // Call the Dialog.
+                        },
+                        icon: const Icon(
+                          Icons.attach_money,
+                          size: 30,
+                        ),
+                        label: const Text(
+                          'Settled Bill',
+                          style: TextStyle(fontSize: 20),
+                        )),
+                  ],
+                ),
               ),
             ),
-          ),
-          Expanded(
-            child: isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(),
-                  )
-                : Column(
-                    children: <Widget>[
-                      Column(
-                        children: [
-                          const CircleAvatar(
-                            radius: 30,
-                            backgroundColor: Colors.blueGrey,
-                            child: Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 50,
+            Expanded(
+              child: isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(),
+                    )
+                  : Column(
+                      children: <Widget>[
+                        Column(
+                          children: [
+                            const CircleAvatar(
+                              radius: 30,
+                              backgroundColor: Colors.blueGrey,
+                              child: Icon(
+                                Icons.person,
+                                color: Colors.white,
+                                size: 50,
+                              ),
                             ),
-                          ),
-                          ListTile(
-                              title: Center(
-                            child: Text("${widget.data['display_name']}",
-                                style: const TextStyle(
-                                    color: Colors.blueGrey,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 20.0)),
-                          )),
-                          // Row(children: [
-                          //   Column(
-                          //     children: [
-                          //       Text('wORKING'),
+                            ListTile(
+                                title: Center(
+                              child: Text("${widget.data['display_name']}",
+                                  style: const TextStyle(
+                                      color: Colors.blueGrey,
+                                      fontWeight: FontWeight.w600,
+                                      fontSize: 20.0)),
+                            )),
+                            // Row(children: [
+                            //   Column(
+                            //     children: [
+                            //       Text('wORKING'),
 
-                          //     ],
-                          //   )
-                          // ],),
-                          floor.isNotEmpty
-                              ? Column(
-                                  children: [
-                                    const SizedBox(
-                                      height: 10.0,
-                                    ),
-                                    const Text(
-                                      'Switch the Floor',
-                                      style: TextStyle(
-                                          color: Colors.blueGrey,
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 20.0),
-                                    ),
-                                    const SizedBox(
-                                      height: 15.0,
-                                    ),
-                                    Container(
-                                      margin: const EdgeInsets.all(8.0),
-                                      height: 70.0,
-                                      child: Center(
-                                        child: ListView.builder(
-                                            shrinkWrap: true,
-                                            scrollDirection: Axis.horizontal,
-                                            itemCount: floor.length,
-                                            itemBuilder: (context, int i) {
-                                              return InkWell(
-                                                onTap: () {
-                                                  Globals.timer?.cancel();
-                                                  Globals.checkTime(context);
-                                                   final myAudio = MyAudio();
-              myAudio.playSound();
-            
-                                                  if (floorId != floor[i].id) {
-                                                    changeFloor(floor[i].id);
-                                                    setState(() {
-                                                      isLoading = true;
-                                                    });
-                                                  }
-                                                },
-                                                child: Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          left: 8.0),
-                                                  child: Container(
-                                                      // height: 20.0,
-                                                      width: 70.0,
-                                                      decoration: BoxDecoration(
-                                                          shape:
-                                                              BoxShape.circle,
-                                                          color: floorId ==
-                                                                  floor[i].id
-                                                              ? Colors.green
-                                                              : Colors.grey,
-                                                          border: Border.all(
-                                                              width: 2,
-                                                              color: floorId ==
-                                                                      floor[i]
-                                                                          .id
-                                                                  ? Colors.green
-                                                                  : Colors
-                                                                      .white)),
-                                                      child: Center(
-                                                          child: Padding(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .all(7.0),
-                                                        child: Text(
-                                                          floor[i].name!,
-                                                          style:
-                                                              const TextStyle(
-                                                                  fontSize:
-                                                                      13.0,
-                                                                  color: Colors
-                                                                      .white),
-                                                        ),
-                                                      ))),
-                                                ),
-                                              );
-                                            }),
+                            //     ],
+                            //   )
+                            // ],),
+                            floor.isNotEmpty
+                                ? Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 10.0,
                                       ),
-                                    ),
-                                    const SizedBox(
-                                      height: 30.0,
-                                    ),
-                                  ],
-                                )
-                              : Container(),
-                          SizedBox(
-                            height: 40,
-                            width: 200,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                primary: Colors.blueGrey,
-                              ),
-                              child: const Text(
-                                "Logout",
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 18.0),
-                              ),
-                              onPressed: () {
-                                Globals.timer?.cancel();
-                                Globals.checkTime(context);
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return AlertDialog(
-                                      title: const Text("You want to logout?"),
-                                      content: const Text("Are you sure?"),
-                                      actions: <Widget>[
-                                        TextButton(
-                                          child: const Text("Yes"),
-                                          onPressed: () async {
-                                            Globals.timer?.cancel();
-                                            Globals.checkTime(context);
-                                            final cartContoller =
-                                                Provider.of<CartController>(
-                                                    context,
-                                                    listen: false);
-                                            SharedPreferences
-                                                sharedPreferences =
-                                                await SharedPreferences
-                                                    .getInstance();
-                                            sharedPreferences.remove('isLogin');
-                                            sharedPreferences.remove('userid');
-                                            sharedPreferences.remove('user');
-                                            sharedPreferences.clear();
-                                            cartContoller.clear();
-                                            Navigator.of(context).pushReplacement(
-                                                MaterialPageRoute(
-                                                    builder: (BuildContext
-                                                            context) =>
-                                                        const LoginScreen()));
-                                          },
+                                      const Text(
+                                        'Switch the Floor',
+                                        style: TextStyle(
+                                            color: Colors.blueGrey,
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 20.0),
+                                      ),
+                                      const SizedBox(
+                                        height: 15.0,
+                                      ),
+                                      Container(
+                                        margin: const EdgeInsets.all(8.0),
+                                        height: 70.0,
+                                        child: Center(
+                                          child: ListView.builder(
+                                              shrinkWrap: true,
+                                              scrollDirection: Axis.horizontal,
+                                              itemCount: floor.length,
+                                              itemBuilder: (context, int i) {
+                                                return InkWell(
+                                                  onTap: () {
+                                                    Globals.timer?.cancel();
+                                                    Globals.checkTime(context);
+                                                    final myAudio = MyAudio();
+                                                    myAudio.playSound();
+
+                                                    if (floorId !=
+                                                        floor[i].id) {
+                                                      changeFloor(floor[i].id);
+                                                      setState(() {
+                                                        isLoading = true;
+                                                      });
+                                                    }
+                                                  },
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 8.0),
+                                                    child: Container(
+                                                        // height: 20.0,
+                                                        width: 70.0,
+                                                        decoration: BoxDecoration(
+                                                            shape:
+                                                                BoxShape.circle,
+                                                            color: floorId ==
+                                                                    floor[i].id
+                                                                ? Colors.green
+                                                                : Colors.grey,
+                                                            border: Border.all(
+                                                                width: 2,
+                                                                color: floorId ==
+                                                                        floor[i]
+                                                                            .id
+                                                                    ? Colors
+                                                                        .green
+                                                                    : Colors
+                                                                        .white)),
+                                                        child: Center(
+                                                            child: Padding(
+                                                          padding:
+                                                              const EdgeInsets
+                                                                  .all(7.0),
+                                                          child: Text(
+                                                            floor[i].name!,
+                                                            style:
+                                                                const TextStyle(
+                                                                    fontSize:
+                                                                        13.0,
+                                                                    color: Colors
+                                                                        .white),
+                                                          ),
+                                                        ))),
+                                                  ),
+                                                );
+                                              }),
                                         ),
-                                        TextButton(
-                                          child: const Text("Cancel"),
-                                          onPressed: () {
-                                            Globals.timer?.cancel();
-                                            Globals.checkTime(context);
-                                            Navigator.of(context).pop();
-                                          },
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                );
-                                //
-                              },
-                            ),
-                          )
-                        ],
-                      )
+                                      ),
+                                      const SizedBox(
+                                        height: 30.0,
+                                      ),
+                                    ],
+                                  )
+                                : Container(),
+                            SizedBox(
+                              height: 40,
+                              width: 200,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary: Colors.blueGrey,
+                                ),
+                                child: const Text(
+                                  "Logout",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 18.0),
+                                ),
+                                onPressed: () {
+                                  Globals.timer?.cancel();
+                                  Globals.checkTime(context);
+                                  showDialog(
+                                    context: context,
+                                    builder: (BuildContext context) {
+                                      return AlertDialog(
+                                        title:
+                                            const Text("You want to logout?"),
+                                        content: const Text("Are you sure?"),
+                                        actions: <Widget>[
+                                          TextButton(
+                                            child: const Text("Yes"),
+                                            onPressed: () async {
+                                              Globals.timer?.cancel();
+                                              Globals.checkTime(context);
+                                              final cartContoller =
+                                                  Provider.of<CartController>(
+                                                      context,
+                                                      listen: false);
+                                              SharedPreferences
+                                                  sharedPreferences =
+                                                  await SharedPreferences
+                                                      .getInstance();
+                                              sharedPreferences
+                                                  .remove('isLogin');
+                                              sharedPreferences
+                                                  .remove('userid');
+                                              sharedPreferences.remove('user');
+                                              sharedPreferences.clear();
+                                              cartContoller.clear();
+                                              Navigator.of(context).pushReplacement(
+                                                  MaterialPageRoute(
+                                                      builder: (BuildContext
+                                                              context) =>
+                                                          const LoginScreen()));
+                                            },
+                                          ),
+                                          TextButton(
+                                            child: const Text("Cancel"),
+                                            onPressed: () {
+                                              Globals.timer?.cancel();
+                                              Globals.checkTime(context);
+                                              Navigator.of(context).pop();
+                                            },
+                                          ),
+                                        ],
+                                      );
+                                    },
+                                  );
+                                  //
+                                },
+                              ),
+                            )
+                          ],
+                        )
+                      ],
+                    ),
+            ),
+            Expanded(
+                child: Column(
+              children: [
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                          text: 'Working Hours: ',
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20.0)),
+                      TextSpan(
+                          text: '${widget.data['total_working_hours']}',
+                          style: const TextStyle(
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20.0))
                     ],
                   ),
-          ),
-          Expanded(
-              child: Column(
-            children: [
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                        text: 'Working Hours: ',
-                        style: TextStyle(
-                            color: Colors.blueGrey,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20.0)),
-                    TextSpan(
-                        text: '${widget.data['total_working_hours']}',
-                        style: const TextStyle(
-                            color: Colors.blueGrey,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20.0))
-                  ],
                 ),
-              ),
-              const SizedBox(
-                height: 10.0,
-              ),
-              Text.rich(
-                TextSpan(
-                  children: [
-                    const TextSpan(
-                        text: 'Reward Point: ',
-                        style: TextStyle(
-                            color: Colors.blueGrey,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20.0)),
-                    TextSpan(
-                        text: '${widget.data['reward_points']}',
-                        style: const TextStyle(
-                            color: Colors.blueGrey,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 20.0))
-                  ],
+                const SizedBox(
+                  height: 10.0,
                 ),
-              ),
-            ],
-          )),
-          Container(
-            width: 100.0,
-          ),
-        ],
-      ),
-    )));
+                Text.rich(
+                  TextSpan(
+                    children: [
+                      const TextSpan(
+                          text: 'Reward Point: ',
+                          style: TextStyle(
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20.0)),
+                      TextSpan(
+                          text: '${widget.data['reward_points']}',
+                          style: const TextStyle(
+                              color: Colors.blueGrey,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 20.0))
+                    ],
+                  ),
+                ),
+              ],
+            )),
+            Container(
+              width: 100.0,
+            ),
+          ],
+        ),
+      ))),
+    );
   }
 }

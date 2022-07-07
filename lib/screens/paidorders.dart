@@ -3,12 +3,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
-
 import 'dart:convert';
 import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:restro_simplify/controller/TimeController.dart';
+import 'package:restro_simplify/controller/audio_controller.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PaidOrders extends StatefulWidget {
@@ -63,155 +63,152 @@ class _PaidOrdersState extends State<PaidOrders> {
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
-    return Scaffold(
-      appBar: AppBar(
-        elevation: 0.0,
-        backgroundColor: Colors.white10,
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back,
-            color: Colors.blueGrey,
-          ),
-          onPressed: () {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-            Navigator.pop(context);
-          },
-        ),
-      ),
-      body: Listener(
-          behavior: HitTestBehavior.opaque,
-          onPointerCancel: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          onPointerDown: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          onPointerHover: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          onPointerMove: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-      
-     child:  count == 0 ?
-           SizedBox(
-              height: height,
-              width: width,
-              child: GestureDetector(
-                onTap: () {
-                  Globals.timer?.cancel();
-                  Globals.checkTime(context);
-                },
-                child: Text("No Orders Yets!",textAlign: TextAlign.center,),
-              ),
-            )
-          : ListView(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    "Paid Orders : " + count.toString(),
-                    style: const TextStyle(
-                        color: Colors.blueGrey,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18),
-                  ),
-                ),
-                GridView.count(
-                  childAspectRatio: 0.8,
-                  shrinkWrap: true,
-                  physics: const ScrollPhysics(),
-                  crossAxisCount: 7,
-                  children: orders!.map((data) {
-                    return Card(
-                      color: Colors.green,
-                      child: InkWell(
-                        onTap: () {
-                          Globals.timer?.cancel();
-                          Globals.checkTime(context);
-                      showToast(
-                               "Bill already paid",
-                                context: context,
-                                  position: StyledToastPosition.center,  
-                                    duration: const Duration(seconds: 2),
- 
-                              backgroundColor: Colors.green);
-                        },
-                        child: Center(
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 5.0),
-                            child: Column(
-                              children: <Widget>[
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0),
-                                  child: SizedBox(
-                                    width: 40.0,
-                                    child: Image.asset(
-                                      "assets/table.png",
-                                      color: Colors.white,
+    return Listener(
+        behavior: HitTestBehavior.opaque,
+        onPointerCancel: (event) {
+          Globals.timer?.cancel();
+          Globals.checkTime(context);
+        },
+        onPointerDown: (event) {
+          Globals.timer?.cancel();
+          Globals.checkTime(context);
+        },
+        onPointerHover: (event) {
+          Globals.timer?.cancel();
+          Globals.checkTime(context);
+        },
+        onPointerMove: (event) {
+          Globals.timer?.cancel();
+          Globals.checkTime(context);
+        },
+        child: Scaffold(
+            body: Column(
+          children: [
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+              IconButton(
+                  onPressed: () {
+                    final myAudio = MyAudio();
+                    Globals.timer?.cancel();
+                    Globals.checkTime(context);
+                    Navigator.pop(context);
+                    myAudio.playSound();
+                  },
+                  icon: const Icon(Icons.arrow_back)),
+              count != 0
+                  ? Text(
+                      "Current Running Tables : " + count.toString(),
+                      style: const TextStyle(
+                          color: Colors.blueGrey,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18),
+                    )
+                  : SizedBox(),
+              SizedBox()
+            ]),
+            count == 0
+                ? GestureDetector(
+                    onTap: () {
+                      Globals.timer?.cancel();
+                      Globals.checkTime(context);
+                    },
+                    child: Center(
+                      heightFactor: height * .04,
+                      child: const Text(
+                        "No Paid Yets!",
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  )
+                : Expanded(
+                    child: GridView.count(
+                      childAspectRatio: 0.8,
+                      shrinkWrap: true,
+                      physics: const ScrollPhysics(),
+                      crossAxisCount: 8,
+                      children: orders!.map((data) {
+                        return Card(
+                          color: Colors.green,
+                          child: InkWell(
+                            onTap: () {
+                              Globals.timer?.cancel();
+                              Globals.checkTime(context);
+                              showToast("Bill already paid",
+                                  context: context,
+                                  position: StyledToastPosition.center,
+                                  duration: const Duration(seconds: 2),
+                                  backgroundColor: Colors.green);
+                            },
+                            child: Center(
+                              child: Container(
+                                margin: const EdgeInsets.only(top: 5.0),
+                                child: Column(
+                                  children: <Widget>[
+                                    const Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 35.0),
+                                      child: SizedBox(
+                                          width: 40.0,
+                                          child: Icon(
+                                            Icons.table_bar,
+                                            size: 35,
+                                            color: Colors.white,
+                                          )),
                                     ),
-                                  ),
-                                ),
-                                Text(
-                                  data['table_name'],
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 13),
-                                ),
-                                Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 4.0),
-                                  child: Text(
-                                    data['settled_time'],
-                                    style: const TextStyle(
-                                        color: Colors.white, fontSize: 13),
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(top: 5),
-                                  child: Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Card(
-                                      color: Colors.lightGreen,
-                                      elevation: 0,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(8.0),
-                                        child: Text(
-                                          "Rs. " + data['net_amount'],
-                                          style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12),
+                                    Text(
+                                      data['table_name'],
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 13),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 4.0),
+                                      child: Text(
+                                        data['settled_time'],
+                                        style: const TextStyle(
+                                            color: Colors.white, fontSize: 13),
+                                      ),
+                                    ),
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 5),
+                                      child: Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Card(
+                                          color: Colors.lightGreen,
+                                          elevation: 0,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              "Rs. " + data['net_amount'],
+                                              style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 12),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ),
-                                Container(
-                                  margin: const EdgeInsets.only(top: 5),
-                                  child: Align(
-                                    alignment: Alignment.bottomCenter,
-                                    child: Text(
-                                      "${data['payment_method']}",
-                                      style: const TextStyle(
-                                          color: Colors.white, fontSize: 15),
+                                    Container(
+                                      margin: const EdgeInsets.only(top: 5),
+                                      child: Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Text(
+                                          "${data['payment_method']}",
+                                          style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 15),
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
-                              ],
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-    ));
+                        );
+                      }).toList(),
+                    ),
+                  ),
+          ],
+        )));
   }
 }

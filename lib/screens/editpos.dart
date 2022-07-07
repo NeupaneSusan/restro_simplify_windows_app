@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/widgets.dart';
 
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 import 'package:provider/provider.dart';
@@ -11,7 +12,6 @@ import 'package:restro_simplify/controller/CartController.dart';
 import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/controller/audio_controller.dart';
 import 'package:restro_simplify/dialog/product_dialog.dart';
-import 'package:restro_simplify/screens/homescreen.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -22,9 +22,11 @@ import 'dart:async';
 import 'package:http/http.dart' as http;
 
 class EditPosScreen extends StatefulWidget {
-  const EditPosScreen({Key? key, this.data, this.orderId}) : super(key: key);
+  const EditPosScreen(
+      {Key? key, this.data, this.orderId, required this.totalUpdate})
+      : super(key: key);
 
-  final data, orderId;
+  final data, orderId, totalUpdate;
 
   @override
   _EditPosScreenState createState() => _EditPosScreenState();
@@ -78,7 +80,7 @@ class _EditPosScreenState extends State<EditPosScreen> {
   }
 
   var oldOrder;
-  var totalUpdate;
+
   List<dynamic>? oldOrderItems;
   double discount = 0.0;
 
@@ -89,8 +91,8 @@ class _EditPosScreenState extends State<EditPosScreen> {
         .get(Uri.parse(url + '/tableOrders/edit/' + userId + '/' + orderId));
     if (res.statusCode == 200) {
       var jsonData = json.decode(res.body);
+
       setState(() {
-        totalUpdate = jsonData["total_update"];
         oldOrder = jsonData['data'];
         oldOrderItems = oldOrder['order_items'];
         guestController.text = oldOrder['no_of_guest'];
@@ -126,23 +128,23 @@ class _EditPosScreenState extends State<EditPosScreen> {
       'Content-type': 'application/json',
       'Accept': 'application/json',
     };
-
+    Uri checkOutUrl = Uri.parse(
+        url + '/tableOrders/' + (userid as String) + '/' + oldOrder['id']);
+    print(checkOutUrl);
     var res = await http.put(
-      Uri.parse(
-          url + '/tableOrders/' + (userid as String) + '/' + oldOrder['id']),
+      checkOutUrl,
       headers: header,
       body: body,
     );
-    print(res.statusCode);
+    print(body);
     if (res.statusCode == 200) {
       toast("Order Updated Successfully", Colors.green);
-      cart.clear();
+
       guestController.text = 0.toString();
-      // Navigator.push(context, MaterialPageRoute(builder: (context) {
-      // return HomeScreen(
-      // selectedTable: null,
-      // );
-      // }));
+      Globals.timer?.cancel();
+      Globals.checkTime(context);
+      cart.clear();
+      Navigator.of(context).pop(true);
       setState(() {
         _isButtonDisabled = 0;
       });
@@ -161,14 +163,9 @@ class _EditPosScreenState extends State<EditPosScreen> {
                     onPressed: () {
                       Globals.timer?.cancel();
                       Globals.checkTime(context);
-                      Navigator.of(context).pop();
+
                       cart.clear();
-                      // Navigator.push(context,
-                      // MaterialPageRoute(builder: (context) {
-                      // return HomeScreen(
-                      // selectedTable: null,
-                      // );
-                      // }));
+                      Navigator.of(context).pop(true);
                     }),
                 const SizedBox(width: 180.0),
               ],
@@ -186,27 +183,6 @@ class _EditPosScreenState extends State<EditPosScreen> {
         _isButtonDisabled = 0;
       });
       return false;
-    }
-  }
-
-  // check internet
-  internetChecker() async {
-    var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile ||
-        connectivityResult == ConnectivityResult.wifi) {
-      GestureDetector(
-          onTap: () {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          child: const EditPosScreen());
-    } else {
-      Scaffold(
-        key: _scaffoldKey,
-        body: const Center(
-          child: Text("No Internet Connection"),
-        ),
-      );
     }
   }
 
@@ -304,9 +280,10 @@ class _EditPosScreenState extends State<EditPosScreen> {
                                       children: [
                                         IconButton(
                                             onPressed: () {
+                                              final myAudio = MyAudio();
                                               Globals.timer?.cancel();
                                               Globals.checkTime(context);
-                                              final myAudio = MyAudio();
+                                              cart.clear();
                                               Navigator.of(context).pop(true);
                                               myAudio.playSound();
                                             },
@@ -926,8 +903,8 @@ class _EditPosScreenState extends State<EditPosScreen> {
                                                                       var body = jsonEncode(<
                                                                           String,
                                                                           dynamic>{
-                                                                        "total_update":
-                                                                            totalUpdate,
+                                                                        "total_updates":
+                                                                            widget.totalUpdate,
                                                                         'order_items':
                                                                             cartItems,
                                                                         'gross_amount': cart
@@ -946,7 +923,7 @@ class _EditPosScreenState extends State<EditPosScreen> {
                                                                         'table_id':
                                                                             oldOrder['table_id'],
                                                                       });
-                                                                      //print(body);
+
                                                                       checkout(
                                                                           body:
                                                                               body,
@@ -956,7 +933,7 @@ class _EditPosScreenState extends State<EditPosScreen> {
                                                                       toast(
                                                                           "No item added",
                                                                           Colors
-                                                                              .yellowAccent);
+                                                                              .deepOrangeAccent);
                                                                     }
                                                                   }
                                                                 }

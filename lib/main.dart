@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'dart:typed_data';
 
 import 'package:http/http.dart' as http;
@@ -11,15 +12,21 @@ import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/controller/sliderlistController.dart';
 import 'package:restro_simplify/models/slider.dart';
 import 'package:restro_simplify/screens/checkLogin.dart';
-import 'package:restro_simplify/screens/loginscreen.dart';
+
 import 'controller/CartController.dart';
+import 'package:desktop_window/desktop_window.dart' as window_size;
+import 'dart:io';
 
 void main() {
-  runApp(MyWidget());
+  WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+    window_size.DesktopWindow.getFullScreen();
+  }
+  runApp(const MyApp());
 }
 
-class MyWidget extends StatelessWidget {
-  const MyWidget({Key? key}) : super(key: key);
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
