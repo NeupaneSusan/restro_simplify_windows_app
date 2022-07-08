@@ -1075,43 +1075,87 @@ class _EditPosScreenState extends State<EditPosScreen> {
                                         padding: const EdgeInsets.all(4.0),
                                         children: _searchResult.map((product) {
                                           return Padding(
-                                            padding: const EdgeInsets.all(2.0),
-                                            child: InkWell(
-                                              onTap: () {
-                                                Globals.timer?.cancel();
-                                                Globals.checkTime(context);
-                                                showDialog(
-                                                    context: context,
-                                                    builder:
-                                                        (BuildContext context) {
-                                                      return ProductDialog(
-                                                        categoryId: product.id,
-                                                      );
-                                                    });
-                                              },
-                                              child: Container(
-                                                decoration: BoxDecoration(
-                                                    color: Colors.blueGrey,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10)),
-                                                child: Padding(
-                                                  padding: const EdgeInsets.all(
-                                                      10.0),
-                                                  child: Center(
-                                                    child: Text(
-                                                      product.name.toString(),
-                                                      style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                              padding:
+                                                  const EdgeInsets.all(2.0),
+                                              child: InkWell(
+                                                  onTap: () {
+                                                    Globals.timer?.cancel();
+                                                    Globals.checkTime(context);
+                                                    showDialog(
+                                                        context: context,
+                                                        builder: (BuildContext
+                                                            context) {
+                                                          return ProductDialog(
+                                                            categoryId:
+                                                                product.id,
+                                                          );
+                                                        });
+                                                  },
+                                                  child: Container(
+                                                    decoration: BoxDecoration(
+                                                        color: Colors.blueGrey,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10)),
+                                                    child: Padding(
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              10.0),
+                                                      child: Column(
+                                                          crossAxisAlignment:
+                                                              CrossAxisAlignment
+                                                                  .center,
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            SizedBox(
+                                                              height: 5.0,
+                                                            ),
+                                                            Expanded(
+                                                              child: Text(
+                                                                product.name
+                                                                    .toString(),
+                                                                style: const TextStyle(
+                                                                    color: Colors
+                                                                        .white,
+                                                                    fontSize:
+                                                                        13,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold),
+                                                              ),
+                                                            ),
+                                                            Container(
+                                                              width: 35,
+                                                              height: 35,
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              50)),
+                                                              child: Center(
+                                                                child: Text(
+                                                                    product
+                                                                        .totalProduct
+                                                                        .toString(),
+                                                                    style: const TextStyle(
+                                                                        color: Colors
+                                                                            .grey,
+                                                                        fontSize:
+                                                                            13,
+                                                                        fontWeight:
+                                                                            FontWeight.bold)),
+                                                              ),
+                                                            ),
+                                                            SizedBox(
+                                                              height: 5.0,
+                                                            ),
+                                                          ]),
                                                     ),
-                                                  ),
-                                                ),
-                                              ),
-                                            ),
-                                          );
+                                                  )));
                                         }).toList()),
                                   )
                                 ],

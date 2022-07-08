@@ -11,7 +11,6 @@ import 'package:restro_simplify/models/Product.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 
-
 class ProductDialog extends StatefulWidget {
   final String categoryId;
   const ProductDialog({Key? key, required this.categoryId}) : super(key: key);
@@ -67,12 +66,9 @@ class _ProductDialogState extends State<ProductDialog> {
   }
 
   void onSearchTextChanged(String text) {
+    Globals.timer?.cancel();
+    Globals.checkTime(context);
 
-          
-          
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-         
     List<Product> myList = text.isEmpty
         ? prouctList
         : prouctList
@@ -86,25 +82,24 @@ class _ProductDialogState extends State<ProductDialog> {
 
   @override
   Widget build(BuildContext context) {
-    return 
-      Listener(
-          behavior: HitTestBehavior.opaque,
-          onPointerCancel: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          onPointerDown: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          onPointerHover: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          onPointerMove: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerCancel: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerDown: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerHover: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerMove: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
       child: Dialog(
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.0)), //this right here
@@ -123,7 +118,7 @@ class _ProductDialogState extends State<ProductDialog> {
                         height: 35,
                         // width:
                         //     MediaQuery.of(context).size.width * 0.15,
-    
+
                         child: TextField(
                           controller: filterController,
                           onChanged: onSearchTextChanged,
@@ -175,7 +170,7 @@ class _ProductDialogState extends State<ProductDialog> {
                           child: Text('No Item Avaible'),
                         )
                       : GridView.count(
-                          crossAxisCount: 6,
+                          crossAxisCount: 8,
                           padding: const EdgeInsets.all(4.0),
                           children: searchProductList.map((product) {
                             return Padding(
@@ -184,10 +179,10 @@ class _ProductDialogState extends State<ProductDialog> {
                                 onTap: () {
                                   Globals.timer?.cancel();
                                   Globals.checkTime(context);
-                               
+
                                   final myAudio = MyAudio();
-              myAudio.playSound();
-            
+                                  myAudio.playSound();
+
                                   final cart = Provider.of<CartController>(
                                       context,
                                       listen: false);
@@ -200,64 +195,75 @@ class _ProductDialogState extends State<ProductDialog> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                       color: Colors.blueGrey,
-                                      borderRadius: BorderRadius.circular(10.0)),
-                                  child: Column(children: [
-                                    Card(
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(50)),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(50),
-                                        child: product.image != null
-                                            ? Image.network(product.image!,
-                                                height: 65, width: 65,
-                                                errorBuilder: (context, x, s) {
-                                                return Container(
-                                                  height: 65,
-                                                  width: 65,
-                                                  padding:
-                                                      const EdgeInsets.all(8),
-                                                  decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              50),
-                                                      border: Border.all(
+                                      borderRadius:
+                                          BorderRadius.circular(10.0)),
+                                  child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Card(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(50)),
+                                          child: ClipRRect(
+                                            borderRadius:
+                                                BorderRadius.circular(50),
+                                            child: product.image != null
+                                                ? Image.network(product.image!,
+                                                    height: 65,
+                                                    width: 65, errorBuilder:
+                                                        (context, x, s) {
+                                                    return Container(
+                                                      height: 65,
+                                                      width: 65,
+                                                      padding:
+                                                          const EdgeInsets.all(
+                                                              8),
+                                                      decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(50),
+                                                          border: Border.all(
+                                                              color:
+                                                                  Colors.white,
+                                                              width: 2)),
+                                                      child: const InkWell(
+                                                        child: Icon(
+                                                          Icons.add,
                                                           color: Colors.white,
-                                                          width: 2)),
-                                                  child: const InkWell(
-                                                    child: Icon(
-                                                      Icons.add,
-                                                      color: Colors.white,
-                                                    ),
+                                                        ),
+                                                      ),
+                                                    );
+                                                  })
+                                                : Image.asset(
+                                                    'assets/logo.png',
+                                                    height: 65,
+                                                    width: 65,
                                                   ),
-                                                );
-                                              })
-                                            : Image.asset(
-                                                'assets/logo.png',
-                                                height: 65,
-                                                width: 65,
-                                              ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(1.0),
-                                      child: Text(
-                                        product.name.toString(),
-                                        style: const TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(1.0),
-                                      child: Text(
-                                        'Rs.' + product.price.toString(),
-                                        style: const TextStyle(
-                                            color: Colors.yellow, fontSize: 12),
-                                      ),
-                                    )
-                                  ]),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(1.0),
+                                          child: Text(
+                                            product.name.toString(),
+                                            style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 11,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.all(1.0),
+                                          child: Text(
+                                            'Rs.' + product.price.toString(),
+                                            style: const TextStyle(
+                                                color: Colors.yellow,
+                                                fontSize: 12),
+                                          ),
+                                        )
+                                      ]),
                                 ),
                               ),
                             );

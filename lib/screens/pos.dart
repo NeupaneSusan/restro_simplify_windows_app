@@ -1019,29 +1019,52 @@ class _PosPageState extends State<PosPage> {
                                               ),
                                               child: Padding(
                                                 padding:
-                                                    const EdgeInsets.all(8.0),
+                                                    const EdgeInsets.all(10.0),
                                                 child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.center,
                                                   mainAxisAlignment:
                                                       MainAxisAlignment.center,
                                                   children: [
-                                                    Text(
-                                                      product.name.toString(),
-                                                      style: const TextStyle(
-                                                          color: Colors.white,
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                    SizedBox(
+                                                      height: 5.0,
                                                     ),
-                                                    Text(
-                                                      product.totalProduct
-                                                          .toString(),
-                                                      style: const TextStyle(
+                                                    Expanded(
+                                                      child: Text(
+                                                        product.name.toString(),
+                                                        style: const TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 13,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .bold),
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      width: 35,
+                                                      height: 35,
+                                                      decoration: BoxDecoration(
                                                           color: Colors.white,
-                                                          fontSize: 13,
-                                                          fontWeight:
-                                                              FontWeight.bold),
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      50)),
+                                                      child: Center(
+                                                        child: Text(
+                                                          product.totalProduct
+                                                              .toString(),
+                                                          style: const TextStyle(
+                                                              color:
+                                                                  Colors.grey,
+                                                              fontSize: 13,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold),
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      height: 5.0,
                                                     ),
                                                   ],
                                                 ),
