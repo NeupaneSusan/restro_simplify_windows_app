@@ -84,6 +84,7 @@ class _PosPageState extends State<PosPage> {
     var floorId = prefs.getString('floorId');
 
     var res = await http.get(Uri.parse(url + '/tables/$floorId'));
+    print(res.statusCode);
     if (res.statusCode == 200) {
       var jsonData = jsonDecode(res.body);
       List<Tables> cats = [];
@@ -1001,8 +1002,6 @@ class _PosPageState extends State<PosPage> {
                                               final myAudio = MyAudio();
                                               myAudio.playSound();
 
-                                              ;
-
                                               showDialog(
                                                   context: context,
                                                   builder:
@@ -1020,16 +1019,31 @@ class _PosPageState extends State<PosPage> {
                                               ),
                                               child: Padding(
                                                 padding:
-                                                    const EdgeInsets.all(10.0),
-                                                child: Center(
-                                                  child: Text(
-                                                    product.name.toString(),
-                                                    style: const TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 13,
-                                                        fontWeight:
-                                                            FontWeight.bold),
-                                                  ),
+                                                    const EdgeInsets.all(8.0),
+                                                child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    Text(
+                                                      product.name.toString(),
+                                                      style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                    Text(
+                                                      product.totalProduct
+                                                          .toString(),
+                                                      style: const TextStyle(
+                                                          color: Colors.white,
+                                                          fontSize: 13,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ],
                                                 ),
                                               ),
                                             ),

@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
           await http.post(Uri.parse(url + '/auth/login'), body: body);
 
       var jsonData = json.decode(response.body);
-
+      print(jsonData);
       if (response.statusCode != 401) {
         setState(() {
           userData = jsonData['userInfo'];

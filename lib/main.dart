@@ -36,7 +36,8 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => CartController()),
-        ChangeNotifierProvider(create: (context) => SliderListController())
+        ChangeNotifierProvider(create: (context) => SliderListController()),
+        ChangeNotifierProvider(create: (context) => TimeController()),
       ],
       child: MaterialApp(
         navigatorKey: Globals.navigatorKey,
@@ -56,12 +57,12 @@ class ContainerPage extends StatefulWidget {
 }
 
 class _ContainerPageState extends State<ContainerPage> {
+  bool isLoading = true;
   @override
   void initState() {
     super.initState();
-    Globals.timer?.cancel();
-    Globals.checkTime(context);
     getImageForSlider();
+    getSliderTime();
   }
 
   readImage(image) async {
@@ -88,28 +89,23 @@ class _ContainerPageState extends State<ContainerPage> {
     }
   }
 
+  getSliderTime() async {
+    final timeValue = Provider.of<TimeController>(context, listen: false);
+    final response = await http
+        .get(Uri.parse("http://192.168.1.1/restroms/api/system/settings"));
+    if (response.statusCode == 200) {
+      print(response.body);
+      final data = jsonDecode(response.body)["data"];
+      print(data);
+      timeValue.timeValue = data["slideshow_timer"];
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Listener(
-          behavior: HitTestBehavior.opaque,
-          onPointerCancel: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          onPointerDown: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          onPointerHover: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          onPointerMove: (event) {
-            Globals.timer?.cancel();
-            Globals.checkTime(context);
-          },
-          child: const CheckLogin()),
-    );
+    return isLoading ? Scaffold() : CheckLogin();
   }
 }

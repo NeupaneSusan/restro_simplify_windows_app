@@ -34,15 +34,18 @@ class _MyFirstScreenState extends State<MyFirstScreen> {
   void initState() {
     fetchTables();
     super.initState();
+
     userData = widget.userData;
     imageByte = widget.imageByte;
   }
 
   Future<String> fetchTables() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    print("object");
+
     var floorId = prefs.getString('floorId');
+    print(floorId);
     var res = await http.get(Uri.parse(url + '/tables/$floorId'));
+    print(res.statusCode);
     if (res.statusCode == 200) {
       var jsonData = jsonDecode(res.body);
       List<Tables> cats = [];

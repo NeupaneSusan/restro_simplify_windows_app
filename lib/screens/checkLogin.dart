@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
 import 'package:http/http.dart' as http;
+import 'package:restro_simplify/controller/TimeController.dart';
 import 'package:restro_simplify/screens/firstScreen.dart';
 import 'package:restro_simplify/screens/loginscreen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -25,6 +27,8 @@ class _CheckLoginState extends State<CheckLogin> {
   @override
   void initState() {
     super.initState();
+    Globals.timer?.cancel();
+    Globals.checkTime(context);
     getUserFromLocalStorage();
   }
 
@@ -89,10 +93,30 @@ class _CheckLoginState extends State<CheckLogin> {
   }
 
   Widget build(BuildContext context) {
-    return isOnline
-        ? Text('')
-        : Center(
-            child: Text("No internate"),
-          );
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerCancel: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerDown: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerHover: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      onPointerMove: (event) {
+        Globals.timer?.cancel();
+        Globals.checkTime(context);
+      },
+      child: Scaffold(
+          body: isOnline
+              ? Text('')
+              : Center(
+                  child: Text("No internate"),
+                )),
+    );
   }
 }
