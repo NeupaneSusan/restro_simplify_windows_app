@@ -58,9 +58,14 @@ class ContainerPage extends StatefulWidget {
 
 class _ContainerPageState extends State<ContainerPage> {
   bool isLoading = true;
+  bool isNet = true;
   @override
   void initState() {
     super.initState();
+    readApi();
+  }
+
+  readApi() {
     getImageForSlider();
     getSliderTime();
   }
@@ -73,39 +78,70 @@ class _ContainerPageState extends State<ContainerPage> {
   }
 
   void getImageForSlider() async {
-    final sliderProvider =
-        Provider.of<SliderListController>(context, listen: false);
-    List<SliderModel> sliderlist = [];
-    var res = await http
-        .get(Uri.parse('http://192.168.1.1/restroms/api/medias/sliders'));
-    if (res.statusCode == 200) {
-      final data = jsonDecode(res.body)['data'];
-      for (var result in data) {
-        var image = await readImage(result['image']);
-        result['image'] = image;
-        sliderlist.add(SliderModel.fromJson(result));
+    try {
+      final sliderProvider =
+          Provider.of<SliderListController>(context, listen: false);
+      List<SliderModel> sliderlist = [];
+      var res = await http
+          .get(Uri.parse('http://192.168.1.1/restroms/api/medias/sliders'));
+      if (res.statusCode == 200) {
+        final data = jsonDecode(res.body)['data'];
+        for (var result in data) {
+          var image = await readImage(result['image']);
+          result['image'] = image;
+          sliderlist.add(SliderModel.fromJson(result));
+        }
+        sliderProvider.setSliderList(sliderlist);
       }
-      sliderProvider.setSliderList(sliderlist);
-    }
+    } catch (error) {}
   }
 
   getSliderTime() async {
-    final timeValue = Provider.of<TimeController>(context, listen: false);
-    final response = await http
-        .get(Uri.parse("http://192.168.1.1/restroms/api/system/settings"));
-    if (response.statusCode == 200) {
-      print(response.body);
-      final data = jsonDecode(response.body)["data"];
-      print(data);
-      timeValue.timeValue = data["slideshow_timer"];
+    try {
+      final timeValue = Provider.of<TimeController>(context, listen: false);
+      final response = await http
+          .get(Uri.parse("http://192.168.1.1/restroms/api/system/settings"));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body)["data"];
+        timeValue.timeValue = data["slideshow_timer"];
+        setState(() {
+          isLoading = false;
+        });
+      } else{
+
+      }
+    } catch (e) {
+      print("Socket exception: ${e}");
+      if (e is SocketException) {
+           showDialogs(e.message);
+      }
     }
-    setState(() {
-      isLoading = false;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return isLoading ? Scaffold() : CheckLogin();
   }
+
+showDialogs (message){
+  return showDialog(
+   context: context,
+   builder: (BuildContext context) {
+     return AlertDialog(
+       title: Text('${message}'),
+       actions: <Widget>[
+         TextButton(
+           child: const Text('No'),
+           onPressed: () {
+             Navigator.pop(context, false);
+             Future.delayed(const Duration(seconds: 2), () {
+               readApi();
+             });
+           },
+         ),
+       ],
+     );
+   },
+ );
+}
 }

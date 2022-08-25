@@ -54,7 +54,6 @@ class _LoginScreenState extends State<LoginScreen> {
           await http.post(Uri.parse(url + '/auth/login'), body: body);
 
       var jsonData = json.decode(response.body);
-      print(jsonData);
       if (response.statusCode != 401) {
         setState(() {
           userData = jsonData['userInfo'];
@@ -132,7 +131,8 @@ class _LoginScreenState extends State<LoginScreen> {
   TextStyle style = const TextStyle(fontFamily: 'Montserrat', fontSize: 20.0);
 
   Future<bool?> _alert() async {
-    return showDialog(
+    return 
+    showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -154,6 +154,9 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       },
     );
+  
+  
+  
   }
 
   @override

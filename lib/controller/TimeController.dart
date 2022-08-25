@@ -11,7 +11,6 @@ class Globals {
     try {
       final timeValue = Provider.of<TimeController>(context, listen: false);
       timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-        print(timer.tick);
         if (timer.tick > timeValue.timeValue) {
           timer.cancel();
           navigatorKey.currentState!.push(
@@ -28,6 +27,7 @@ class TimeController with ChangeNotifier {
   int? _timeValue;
   set timeValue(int val) {
     _timeValue = val;
+    notifyListeners();
   }
 
   int get timeValue => _timeValue!;

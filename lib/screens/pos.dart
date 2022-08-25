@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 import 'package:flutter_styled_toast/flutter_styled_toast.dart';
 
@@ -123,6 +122,8 @@ class _PosPageState extends State<PosPage> {
       headers: header,
       body: body,
     );
+    print(res.statusCode);
+    print(res.body);
     if (res.statusCode == 200) {
       toast("Order Success", Colors.green);
       selectedTable = null;
@@ -1027,7 +1028,7 @@ class _PosPageState extends State<PosPage> {
                                                       MainAxisAlignment.center,
                                                   children: [
                                                     SizedBox(
-                                                      height: 5.0,
+                                                      height: 2.0,
                                                     ),
                                                     Expanded(
                                                       child: Text(
@@ -1064,7 +1065,7 @@ class _PosPageState extends State<PosPage> {
                                                       ),
                                                     ),
                                                     SizedBox(
-                                                      height: 5.0,
+                                                      height: 2.0,
                                                     ),
                                                   ],
                                                 ),
